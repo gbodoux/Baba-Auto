@@ -1,0 +1,11 @@
+Model Information:
+* title:	BMW M3 (G80)
+* source:	https://sketchfab.com/3d-models/bmw-m3-g80-e7d8be35e2f34b7f84e0543fff7fda27
+* author:	Cherk (https://sketchfab.com/alex20010804)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "BMW M3 (G80)" (https://sketchfab.com/3d-models/bmw-m3-g80-e7d8be35e2f34b7f84e0543fff7fda27) by Cherk (https://sketchfab.com/alex20010804) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
