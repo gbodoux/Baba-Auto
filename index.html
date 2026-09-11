@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>BABA AUTO — Achat · Vente · Mécanique</title>
+<meta name="theme-color" content="#0b0b0d">
+<style>
+:root{
+  --yellow:#ffc400;
+  --red:#e52621;
+  --ink:#0d0d0f;
+  --paper:#f5f2eb;
+  --muted:#8b8b91;
+  --card:#151518;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,Arial,Helvetica,sans-serif;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font:inherit}
+img{display:block}
+.wrap{width:min(1180px,92vw);margin:auto}
+
+/* INTRO */
+#brandIntro{
+  position:fixed;inset:0;z-index:99999;background:#08080a;color:#fff;
+  display:grid;place-items:center;overflow:hidden;transition:opacity .7s ease,visibility .7s ease;
+}
+#brandIntro.done{opacity:0;visibility:hidden}
+.introGlow{position:absolute;inset:-20%;background:
+  radial-gradient(circle at 50% 45%,rgba(255,196,0,.12),transparent 28%),
+  radial-gradient(circle at 60% 58%,rgba(229,38,33,.10),transparent 26%)}
+.logoTrack{
+  position:absolute;left:0;right:0;top:50%;height:170px;transform:translateY(-50%);
+  overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+}
+.logoRail{display:flex;gap:54px;align-items:center;height:100%;width:max-content;animation:railMove 8.6s cubic-bezier(.22,.75,.25,1) forwards}
+.introLogo{
+  width:104px;height:104px;object-fit:contain;filter:grayscale(1) brightness(7);
+  opacity:.28;transform:scale(.75);animation:pulseLogo 1.1s ease-in-out infinite alternate
+}
+.introLogo:nth-child(2n){animation-delay:.15s}.introLogo:nth-child(3n){animation-delay:.3s}
+.introFinal{
+  position:relative;z-index:2;text-align:center;opacity:0;transform:scale(.82);
+  animation:showFinal 1.4s ease 7.2s forwards;
+}
+.introFinal .ba{font-size:clamp(52px,15vw,118px);font-weight:1000;letter-spacing:-6px;line-height:.82}
+.introFinal .ba span{color:var(--yellow)}
+.introFinal .auto{color:var(--red);letter-spacing:13px;font-weight:900;font-size:clamp(15px,3.8vw,26px);margin-top:18px}
+.introFinal .line{width:0;height:4px;background:linear-gradient(90deg,var(--yellow),var(--red));margin:24px auto 0;animation:lineGrow .8s ease 7.75s forwards}
+@keyframes railMove{0%{transform:translateX(100vw)}100%{transform:translateX(-2900px)}}
+@keyframes pulseLogo{to{opacity:.8;transform:scale(1)}}
+@keyframes showFinal{to{opacity:1;transform:scale(1)}}
+@keyframes lineGrow{to{width:190px}}
+
+/* HEADER */
+header{
+  position:sticky;top:0;z-index:1000;background:rgba(245,242,235,.88);
+  backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,0,0,.06)
+}
+.head{height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{font-weight:1000;letter-spacing:-1.7px;font-size:26px}.brand span{color:var(--red)}
+.phone{font-weight:900;font-size:14px}
+.menu{display:flex;align-items:center;gap:18px;font-size:13px;font-weight:800}
+.menu a{opacity:.72}.menu a:hover{opacity:1}
+.pill{padding:11px 16px;border-radius:999px;background:var(--ink);color:#fff}
+
+/* HERO */
+.hero{
+  min-height:82svh;display:grid;align-items:end;position:relative;overflow:hidden;color:#fff;
+  background:
+   radial-gradient(circle at 65% 35%,rgba(255,196,0,.14),transparent 24%),
+   radial-gradient(circle at 20% 70%,rgba(229,38,33,.12),transparent 28%),
+   linear-gradient(145deg,#0a0a0d 0%,#121216 55%,#08080a 100%);
+}
+.hero:before{
+  content:"";position:absolute;inset:0;background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:44px 44px;mask-image:linear-gradient(#000,transparent)
+}
+.heroContent{position:relative;z-index:2;padding:90px 0 64px}
+.kicker{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:900;letter-spacing:2.4px;text-transform:uppercase;color:#ddd}
+.kicker i{width:36px;height:4px;background:var(--yellow)}
+h1{font-size:clamp(58px,13vw,150px);line-height:.77;margin:22px 0 26px;letter-spacing:-7px}
+h1 span{display:block;color:var(--yellow)}
+.hero p{max-width:620px;color:#b9b9bf;font-size:clamp(16px,2vw,21px);line-height:1.55}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{border:0;border-radius:999px;padding:15px 22px;font-weight:900;cursor:pointer}
+.btn.primary{background:var(--yellow);color:#121212}.btn.ghost{background:#232329;color:#fff;border:1px solid #333}
+.heroTicker{
+  position:absolute;right:-34px;bottom:35px;writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:11px;font-weight:900;letter-spacing:5px;color:#777
+}
+
+/* BRAND MARQUEE */
+.brandMarquee{background:#fff;border-bottom:1px solid #e8e5df;overflow:hidden;padding:21px 0}
+.marqueeRail{display:flex;gap:42px;width:max-content;animation:marquee 24s linear infinite}
+.brandChip{height:64px;min-width:104px;display:grid;place-items:center;opacity:.65;transition:.25s}
+.brandChip:hover{opacity:1;transform:scale(1.08)}
+.brandChip img{max-width:62px;max-height:52px;object-fit:contain;filter:grayscale(1)}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+/* SECTIONS */
+section{padding:92px 0}
+.secHead{display:flex;justify-content:space-between;align-items:end;gap:25px;margin-bottom:34px}
+.eyebrow{font-size:11px;font-weight:1000;letter-spacing:3px;text-transform:uppercase;color:var(--red)}
+h2{font-size:clamp(38px,6vw,74px);line-height:.94;margin:8px 0 0;letter-spacing:-3.5px}
+.secHead p{max-width:500px;color:#68686d;line-height:1.55}
+
+/* BRAND CATEGORIES */
+#marques{background:#ece8df}
+.brandGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.brandCard{
+  position:relative;min-height:250px;border-radius:24px;overflow:hidden;background:#111115;color:#fff;
+  padding:24px;display:flex;align-items:flex-end;isolation:isolate;cursor:pointer;
+  box-shadow:0 12px 30px rgba(0,0,0,.08);transition:.35s cubic-bezier(.2,.7,.2,1)
+}
+.brandCard:hover{transform:translateY(-7px);box-shadow:0 22px 46px rgba(0,0,0,.16)}
+.brandCard:before{content:"";position:absolute;inset:0;background:
+  radial-gradient(circle at 70% 25%,rgba(255,196,0,.16),transparent 36%),
+  linear-gradient(180deg,transparent 18%,rgba(0,0,0,.68));z-index:-1}
+.bgLogo{position:absolute;width:72%;height:72%;object-fit:contain;left:50%;top:44%;transform:translate(-50%,-50%);
+  opacity:.12;filter:grayscale(1) brightness(4);z-index:-2;transition:.35s}
+.brandCard:hover .bgLogo{opacity:.22;transform:translate(-50%,-50%) scale(1.08)}
+.brandName{font-size:25px;font-weight:1000;letter-spacing:-1px}
+.brandCount{font-size:11px;color:#a7a7ad;font-weight:800;text-transform:uppercase;letter-spacing:1.4px;margin-top:5px}
+.arrow{position:absolute;right:20px;bottom:22px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#111;font-size:18px}
+
+/* STOCK */
+#stock{background:#f7f4ed}
+.stockGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.emptyStock{grid-column:1/-1;background:#fff;border-radius:24px;padding:45px;text-align:center;border:1px solid #e8e5df}
+.emptyStock b{font-size:24px}.emptyStock p{color:#777;margin:8px auto 0;max-width:520px}
+
+/* SERVICES */
+.services{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.service{border-radius:24px;background:#111115;color:#fff;padding:34px;min-height:250px}
+.service .num{font-weight:1000;color:var(--yellow);font-size:12px;letter-spacing:2px}
+.service h3{font-size:31px;letter-spacing:-1.5px;margin:48px 0 12px}
+.service p{color:#a8a8af;line-height:1.55}
+
+/* CONTACT */
+.contact{background:var(--yellow);padding:84px 0}
+.contactBox{display:flex;justify-content:space-between;align-items:center;gap:30px}
+.contact h2{margin:0;color:#111}.contact p{font-weight:700;max-width:560px}
+.contact .btn{background:#111;color:#fff}
+
+/* PAGE LOADER */
+#pageLoader{position:fixed;inset:0;z-index:100000;background:#09090b;display:grid;place-items:center;opacity:0;visibility:hidden;transition:.22s}
+#pageLoader.on{opacity:1;visibility:visible}
+.loadingInner{text-align:center;color:#fff}
+.loadingBrand{font-weight:1000;font-size:42px;letter-spacing:-2px}.loadingBrand span{color:var(--yellow)}
+.roadLoad{position:relative;width:260px;height:68px;margin:24px auto 8px;border-bottom:3px solid #34343a;overflow:hidden}
+.miniCar{position:absolute;left:50%;bottom:7px;width:74px;height:25px;transform:translateX(-50%);animation:bob .42s ease-in-out infinite alternate}
+.miniCar:before{content:"";position:absolute;left:6px;right:6px;bottom:6px;height:14px;background:var(--yellow);border-radius:15px 20px 5px 5px}
+.miniCar:after{content:"";position:absolute;left:24px;bottom:16px;width:31px;height:10px;background:#252b36;clip-path:polygon(15% 100%,35% 0,80% 0,100% 100%)}
+.wheel{position:absolute;bottom:0;width:13px;height:13px;border:3px solid #3d3d43;background:#050505;border-radius:50%;animation:spin .35s linear infinite}
+.w1{left:12px}.w2{right:10px}
+.loadDash{position:absolute;left:0;right:0;bottom:-2px;height:3px;background:repeating-linear-gradient(90deg,#fff 0 24px,transparent 24px 50px);animation:dash .35s linear infinite}
+.loadingTxt{font-size:10px;letter-spacing:4px;font-weight:900;color:#a9a9af;text-transform:uppercase}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes dash{to{background-position:-50px 0}}@keyframes bob{to{transform:translateX(-50%) translateY(-3px)}}
+
+/* FOOTER */
+footer{background:#09090b;color:#fff;padding:38px 0}
+.foot{display:flex;justify-content:space-between;gap:20px;align-items:center;color:#9a9aa0;font-size:12px}
+.foot strong{color:#fff;font-size:19px}
+
+@media(max-width:900px){
+  .menu a:not(.pill){display:none}
+  .brandGrid{grid-template-columns:repeat(2,1fr)}
+  .stockGrid,.services{grid-template-columns:1fr}
+  .contactBox,.secHead{align-items:flex-start;flex-direction:column}
+}
+@media(max-width:520px){
+  .head{height:68px}.brand{font-size:22px}.phone{display:none}
+  h1{letter-spacing:-4px}
+  .hero{min-height:78svh}.heroContent{padding:62px 0 46px}
+  .brandGrid{grid-template-columns:1fr 1fr;gap:10px}
+  .brandCard{min-height:190px;border-radius:19px;padding:18px}
+  .brandName{font-size:20px}.arrow{display:none}
+  section{padding:68px 0}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
+}
+
+.officialLogo{display:inline-flex;align-items:center}
+.companyMark{display:block;width:260px;height:auto;overflow:visible}
+header .officialLogo .companyMark{width:205px}
+.introFinal{background:#fff;padding:30px 38px;border-radius:20px;box-shadow:0 22px 70px rgba(0,0,0,.18)}
+.introFinal .officialLogo .companyMark{width:min(520px,78vw)}
+@media(max-width:520px){
+  header .officialLogo .companyMark{width:158px}
+  .introFinal{padding:22px 18px;border-radius:16px}
+  .introFinal .officialLogo .companyMark{width:82vw}
+}
+
+/* LOGIN + ADMIN */
+.loginBtn{border:0;background:#e52621;color:#fff;border-radius:999px;padding:11px 15px;font-weight:900;cursor:pointer}
+.modal{position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,.72);display:none;place-items:center;padding:20px;backdrop-filter:blur(9px)}
+.modal.on{display:grid}.modalBox{width:min(460px,94vw);background:#fff;border-radius:25px;padding:27px;box-shadow:0 30px 90px rgba(0,0,0,.35)}
+.modalTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modalTop h3{margin:0;font-size:27px}.x{border:0;background:#eee;width:38px;height:38px;border-radius:50%;font-size:21px}
+.field{margin:13px 0}.field label{display:block;font-size:11px;font-weight:900;letter-spacing:1px;margin-bottom:6px}.field input{width:100%;border:1px solid #ddd;border-radius:13px;padding:14px;font-size:16px}
+.fullBtn{width:100%;border:0;border-radius:13px;padding:14px;background:#111;color:#fff;font-weight:900;margin-top:8px}
+.adminChoice{margin-top:12px;width:100%;border:0;background:#ffc400;border-radius:13px;padding:13px;font-weight:900}
+#adminPanel{position:fixed;inset:0;z-index:100002;background:#f3f0e9;display:none;overflow:auto}
+#adminPanel.on{display:block}.adminHead{background:#0d0d10;color:#fff;padding:18px 4vw;display:flex;justify-content:space-between;align-items:center}.adminBody{width:min(1050px,92vw);margin:35px auto}.adminGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.adminCard{background:#fff;border-radius:20px;padding:24px;min-height:150px}.adminCard b{font-size:21px}.adminCard p{color:#777;line-height:1.45}.adminClose{background:#e52621;color:#fff;border:0;border-radius:999px;padding:10px 15px;font-weight:900}
+@media(max-width:700px){.adminGrid{grid-template-columns:1fr}.loginBtn{padding:9px 12px;font-size:12px}}
+
+
+#brandIntro:after{content:"";position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:1;animation:introWhite .55s ease 7s forwards}
+.introFinal{z-index:3}
+@keyframes introWhite{to{opacity:1}}
+
+</style>
+</head>
+<body>
+
+<div id="brandIntro">
+  <div class="introGlow"></div>
+  <div class="logoTrack"><div class="logoRail" id="introRail"></div></div>
+  <div class="introFinal">
+    <div class="officialLogo" aria-label="BA BA AUTO - Véhicules d'occasion">
+  <svg class="companyMark" viewBox="0 0 520 180" role="img" aria-label="BA BA AUTO, véhicules d'occasion">
+    <path d="M28 69 C85 14 179 10 267 52" fill="none" stroke="#d92722" stroke-width="14" stroke-linecap="round"/>
+    <path d="M43 81 C105 40 176 40 247 68" fill="none" stroke="#151515" stroke-width="8" stroke-linecap="round"/>
+    <path d="M55 112 C81 91 111 84 153 84 L210 84 C238 85 260 96 279 114 L303 117 C315 118 322 126 322 138 L322 145 L296 145
+             C292 162 278 171 260 171 C242 171 228 162 224 145 L117 145
+             C113 162 99 171 81 171 C63 171 49 162 45 145 L26 145 L26 132
+             C26 122 37 115 55 112 Z" fill="#151515"/>
+    <circle cx="81" cy="145" r="14" fill="#f5f5f5"/><circle cx="260" cy="145" r="14" fill="#f5f5f5"/>
+    <text x="337" y="87" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="900" fill="#151515">VÉHICULES</text>
+    <text x="337" y="115" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="900" fill="#151515">D'OCCASION</text>
+    <rect x="326" y="126" width="185" height="43" rx="3" fill="#d92722"/>
+    <text x="337" y="158" font-family="Arial,Helvetica,sans-serif" font-size="36" font-weight="900" font-style="italic" fill="#fff">BA BA</text>
+    <text x="439" y="158" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="900" font-style="italic" fill="#151515">AUTO</text>
+  </svg>
+</div>
+    <div class="line"></div>
+  </div>
+</div>
+
+<div id="pageLoader">
+  <div class="loadingInner">
+    <div class="loadingBrand">BABA <span>AUTO</span></div>
+    <div class="roadLoad">
+      <div class="miniCar"><i class="wheel w1"></i><i class="wheel w2"></i></div>
+      <div class="loadDash"></div>
+    </div>
+    <div class="loadingTxt">Chargement</div>
+  </div>
+</div>
+
+<header>
+  <div class="wrap head">
+    <a class="brand" href="#top"><div class="officialLogo" aria-label="BA BA AUTO - Véhicules d'occasion">
+  <svg class="companyMark" viewBox="0 0 520 180" role="img" aria-label="BA BA AUTO, véhicules d'occasion">
+    <path d="M28 69 C85 14 179 10 267 52" fill="none" stroke="#d92722" stroke-width="14" stroke-linecap="round"/>
+    <path d="M43 81 C105 40 176 40 247 68" fill="none" stroke="#151515" stroke-width="8" stroke-linecap="round"/>
+    <path d="M55 112 C81 91 111 84 153 84 L210 84 C238 85 260 96 279 114 L303 117 C315 118 322 126 322 138 L322 145 L296 145
+             C292 162 278 171 260 171 C242 171 228 162 224 145 L117 145
+             C113 162 99 171 81 171 C63 171 49 162 45 145 L26 145 L26 132
+             C26 122 37 115 55 112 Z" fill="#151515"/>
+    <circle cx="81" cy="145" r="14" fill="#f5f5f5"/><circle cx="260" cy="145" r="14" fill="#f5f5f5"/>
+    <text x="337" y="87" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="900" fill="#151515">VÉHICULES</text>
+    <text x="337" y="115" font-family="Arial,Helvetica,sans-serif" font-size="25" font-weight="900" fill="#151515">D'OCCASION</text>
+    <rect x="326" y="126" width="185" height="43" rx="3" fill="#d92722"/>
+    <text x="337" y="158" font-family="Arial,Helvetica,sans-serif" font-size="36" font-weight="900" font-style="italic" fill="#fff">BA BA</text>
+    <text x="439" y="158" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="900" font-style="italic" fill="#151515">AUTO</text>
+  </svg>
+</div></a>
+    <nav class="menu">
+      <a href="#stock">Stock</a>
+      <a href="#marques">Marques</a>
+      <a href="#services">Services</a>
+      <a href="#contact" class="pill">Contacter le garage</a>
+    </nav>
+    <a class="phone" href="tel:+33615912959">06 15 91 29 59</a><button class="loginBtn" id="openLogin">Connexion</button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap heroContent">
+      <div class="kicker"><i></i> Achat · Vente · Mécanique</div>
+      <h1>TOUTES LES <span>MARQUES.</span></h1>
+      <p>Une sélection multimarque pensée pour ceux qui aiment vraiment l’automobile. Trouvez votre prochaine voiture, faites reprendre la vôtre ou confiez-nous son entretien.</p>
+      <div class="actions">
+        <a class="btn primary" href="#marques">Explorer les marques</a>
+        <a class="btn ghost" href="#contact">Contacter le garage</a>
+      </div>
+    </div>
+    <div class="heroTicker">BABA AUTO · MULTIMARQUE · FRANCE</div>
+  </section>
+
+  <div class="brandMarquee">
+    <div class="marqueeRail" id="marqueeRail"></div>
+  </div>
+
+  <section id="marques">
+    <div class="wrap">
+      <div class="secHead">
+        <div><div class="eyebrow">Toutes les marques</div><h2>Choisissez votre univers.</h2></div>
+        <p>Chaque marque possède son propre espace. Le logo apparaît directement en fond de catégorie pour identifier instantanément l’univers du véhicule.</p>
+      </div>
+      <div class="brandGrid" id="brandGrid"></div>
+    </div>
+  </section>
+
+  <section id="stock">
+    <div class="wrap">
+      <div class="secHead">
+        <div><div class="eyebrow">Disponible au garage</div><h2>Notre stock.</h2></div>
+        <p>Les véhicules ajoutés depuis l’administration apparaîtront ici et pourront être filtrés par marque.</p>
+      </div>
+      <div class="stockGrid">
+        <div class="emptyStock">
+          <b>Le prochain véhicule peut être le vôtre.</b>
+          <p>Le stock est prêt à être alimenté depuis l’espace administrateur BABA AUTO.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services">
+    <div class="wrap">
+      <div class="secHead">
+        <div><div class="eyebrow">BABA AUTO</div><h2>Plus qu’un garage.</h2></div>
+      </div>
+      <div class="services">
+        <article class="service"><div class="num">01 · ACHAT</div><h3>Trouvez votre voiture.</h3><p>Recherche multimarque, sélection de véhicules et accompagnement jusqu’à la remise des clés.</p></article>
+        <article class="service"><div class="num">02 · REPRISE</div><h3>Vendez simplement.</h3><p>Estimation et reprise de votre véhicule avec une démarche claire et rapide.</p></article>
+        <article class="service"><div class="num">03 · MÉCANIQUE</div><h3>Entretenez-la.</h3><p>Entretien, diagnostic et interventions mécaniques pour garder votre véhicule en pleine forme.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap contactBox">
+      <div><h2>Parlons de votre prochaine voiture.</h2><p>Une question, une reprise ou un véhicule précis en tête ? Contactez directement BABA AUTO.</p></div>
+      <a class="btn" href="tel:+33615912959">06 15 91 29 59</a>
+    </div>
+  </section>
+</main>
+
+
+<div class="modal" id="loginModal">
+  <div class="modalBox">
+    <div class="modalTop"><h3>Connexion BABA AUTO</h3><button class="x" id="closeLogin">×</button></div>
+    <div class="field"><label>E-MAIL / IDENTIFIANT</label><input id="loginUser" autocomplete="username" placeholder="Votre identifiant"></div>
+    <div class="field"><label>MOT DE PASSE</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="fullBtn" id="clientLogin">Se connecter</button>
+    <button class="adminChoice" id="adminLogin">Accès administration</button>
+    <p style="font-size:11px;color:#888;margin:14px 2px 0">Version démonstration : l'authentification réelle sera reliée à Supabase.</p>
+  </div>
+</div>
+<div id="adminPanel">
+  <div class="adminHead"><strong>BABA AUTO · ADMINISTRATION</strong><button class="adminClose" id="closeAdmin">Fermer</button></div>
+  <div class="adminBody">
+    <div class="eyebrow">Tableau de bord</div><h2>Administration.</h2>
+    <div class="adminGrid">
+      <div class="adminCard"><b>🚗 Véhicules</b><p>Ajouter, modifier ou retirer les véhicules du stock, avec jusqu'à 10 photos.</p><button class="btn primary">Gérer le stock</button></div>
+      <div class="adminCard"><b>🏷️ Marques</b><p>Gérer les catégories et les marques visibles sur le site.</p><button class="btn primary">Gérer les marques</button></div>
+      <div class="adminCard"><b>👥 Comptes</b><p>Gestion des comptes clients et des rôles administratifs.</p><button class="btn primary">Gérer les comptes</button></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap foot"><strong>BABA AUTO</strong><span>Achat · Vente · Mécanique</span><span>© 2026 BABA AUTO</span></div>
+</footer>
+
+<script>
+const BRANDS=[
+  ['BMW','bmw'],['Mercedes-Benz','mercedesbenz'],['Audi','audi'],['Volkswagen','volkswagen'],
+  ['Porsche','porsche'],['Peugeot','peugeot'],['Renault','renault'],['Citroën','citroen'],
+  ['Toyota','toyota'],['Ford','ford'],['Opel','opel'],['Nissan','nissan'],
+  ['Tesla','tesla'],['Volvo','volvo'],['Kia','kia'],['Hyundai','hyundai'],
+  ['SEAT','seat'],['Škoda','skoda'],['Fiat','fiat'],['Honda','honda'],
+  ['Mazda','mazda'],['Mitsubishi','mitsubishi'],['Jeep','jeep'],['Land Rover','landrover'],
+  ['Ferrari','ferrari'],['Lamborghini','lamborghini'],['Alfa Romeo','alfaromeo'],['Mini','mini'],
+  ['Dacia','dacia'],['Cupra','cupra']
+];
+const icon=(slug,color='111111')=>`https://cdn.simpleicons.org/${slug}/${color}`;
+
+function logoImg(name,slug,cls=''){
+  return `<img class="${cls}" src="${icon(slug,'ffffff')}" alt="${name}" loading="lazy"
+    onerror="this.style.display='none'">`;
+}
+
+// Intro: duplicate brands to guarantee a full sweep.
+document.getElementById('introRail').innerHTML=[...BRANDS,...BRANDS.slice(0,10)]
+  .map(([n,s])=>logoImg(n,s,'introLogo')).join('');
+
+// Continuous marquee.
+const marquee=[...BRANDS,...BRANDS];
+document.getElementById('marqueeRail').innerHTML=marquee.map(([n,s])=>
+  `<div class="brandChip" title="${n}"><img src="${icon(s,'111111')}" alt="${n}" onerror="this.parentNode.innerHTML='<b>${n}</b>'"></div>`
+).join('');
+
+// Brand category cards.
+document.getElementById('brandGrid').innerHTML=BRANDS.map(([n,s],i)=>`
+  <article class="brandCard" data-brand="${n}">
+    <img class="bgLogo" src="${icon(s,'ffffff')}" alt="" onerror="this.style.display='none'">
+    <div><div class="brandName">${n}</div><div class="brandCount">Voir les véhicules</div></div>
+    <div class="arrow">→</div>
+  </article>
+`).join('');
+
+// End intro after BABA AUTO reveal.
+setTimeout(()=>{const t=document.querySelector('.logoTrack');if(t){t.style.transition='opacity .45s ease';t.style.opacity='0';}},7000);
+setTimeout(()=>document.getElementById('brandIntro').classList.add('done'),9300);
+setTimeout(()=>{const i=document.getElementById('brandIntro'); if(i)i.remove()},10100);
+
+// Branded loading transition for internal navigation.
+function transitionTo(target){
+  const loader=document.getElementById('pageLoader');
+  loader.classList.add('on');
+  setTimeout(()=>{
+    loader.classList.remove('on');
+    document.querySelector(target)?.scrollIntoView({behavior:'smooth',block:'start'});
+  },820);
+}
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[href^="#"]');
+  if(!a)return;
+  const href=a.getAttribute('href');
+  if(!href || href==='#')return;
+  e.preventDefault();
+  transitionTo(href);
+});
+document.querySelectorAll('.brandCard').forEach(card=>{
+  card.addEventListener('click',()=>transitionTo('#stock'));
+});
+
+const loginModal=document.getElementById('loginModal');
+document.getElementById('openLogin').onclick=()=>loginModal.classList.add('on');
+document.getElementById('closeLogin').onclick=()=>loginModal.classList.remove('on');
+document.getElementById('clientLogin').onclick=()=>alert('Connexion client : branchement Supabase à venir.');
+document.getElementById('adminLogin').onclick=()=>{
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(u==='admin' && p==='baba2026'){
+    loginModal.classList.remove('on');
+    document.getElementById('adminPanel').classList.add('on');
+  }else alert('Identifiants administrateur incorrects.');
+};
+document.getElementById('closeAdmin').onclick=()=>document.getElementById('adminPanel').classList.remove('on');
+
+</script>
+</body>
+</html>
