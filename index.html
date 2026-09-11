@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BABA AUTO — Achat, vente et mécanique toutes marques</title>
+<meta name="description" content="BABA AUTO — véhicules d'occasion toutes marques, reprise sous 24 h, atelier mécanique intégré.">
+<meta name="theme-color" content="#FFC400">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,75..125,400..900;1,75..125,600..900&family=Source+Serif+4:opsz,wght@8..60,300..600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFFFFF;
+  --bone:#F7F4ED;
+  --ink:#17130C;
+  --ink-soft:#6B6355;
+  --yellow:#FFC400;
+  --yellow-deep:#F2A900;
+  --red:#E0231F;
+  --line:rgba(23,19,12,.12);
+  --f-display:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --f-text:'Source Serif 4',Georgia,serif;
+  --pad:clamp(20px,5vw,72px);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--f-text);font-size:clamp(15px,1.05vw,17px);line-height:1.65;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.intro-lock{overflow:hidden;height:100%}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--yellow);color:var(--ink)}
+:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+h1,h2,h3{font-family:var(--f-display);letter-spacing:-.02em;margin:0}
+
+/* ---------------- scène 3D ---------------- */
+#stage{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(120% 90% at 50% 38%,#272727 0%,#171717 58%,#0C0C0C 100%)}
+#stage canvas{display:block;width:100%;height:100%}
+body.page-inner #stage{opacity:0;transition:opacity .5s}
+#flash{position:fixed;inset:0;z-index:96;background:#fff;opacity:0;pointer-events:none}
+#motionblur{position:fixed;inset:0;z-index:88;opacity:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,rgba(224,35,31,0) 0 16px,rgba(224,35,31,.07) 16px 17px)}
+
+/* vagues plein écran pour les transitions cinématiques */
+#waveWipe{display:none!important}
+body.intro-complete #waveWipe{display:none!important;visibility:hidden!important}
+#waveWipe .sheet{position:absolute;inset:0;transform:translateY(105%)}
+#waveWipe svg{position:absolute;left:0;width:100%;height:100%}
+
+/* ---------------- loader ---------------- */
+#loader{position:fixed;inset:0;z-index:120;background:var(--bone);
+  display:grid;place-items:center;transition:opacity .55s var(--ease)}
+#loader.gone{opacity:0;pointer-events:none}
+.tach{width:min(76vw,340px);aspect-ratio:1;position:relative}
+.tach svg.gauge{width:100%;height:100%;overflow:visible}
+.tach-track{fill:none;stroke:rgba(23,19,12,.10);stroke-width:3}
+.tach-arc{fill:none;stroke:var(--yellow);stroke-width:5;stroke-linecap:round;
+  stroke-dasharray:1;stroke-dashoffset:1}
+.tach-red{fill:none;stroke:var(--red);stroke-width:3;opacity:.55}
+.tach-tick{stroke:rgba(23,19,12,.35);stroke-width:1.4}
+.tach-tick.major{stroke:rgba(23,19,12,.75);stroke-width:2.2}
+.tach-num{fill:rgba(23,19,12,.7);font-family:var(--f-display);font-size:15px;
+  font-weight:700;text-anchor:middle;dominant-baseline:middle}
+.needle{position:absolute;left:50%;top:50%;width:3px;height:37%;
+  background:linear-gradient(180deg,var(--red),rgba(224,35,31,.2));
+  transform-origin:50% 100%;transform:translate(-50%,-100%) rotate(-135deg);border-radius:3px}
+.needle::after{content:'';position:absolute;left:50%;bottom:-5px;width:10px;height:10px;
+  transform:translateX(-50%);border-radius:50%;background:var(--red);box-shadow:0 0 0 3px var(--bone)}
+.tach-core{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:2px}
+.tach-pct{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,7vw,42px);
+  line-height:1;margin-top:24px;position:relative;z-index:3}
+.tach-unit{font-family:var(--f-display);font-size:11px;letter-spacing:.24em;color:var(--ink-soft);font-weight:600}
+.loader-logo{position:absolute;top:calc(50% - 150px);left:50%;transform:translateX(-50%);width:190px}
+
+/* ---------------- logo ---------------- */
+.logo{width:clamp(132px,17vw,168px)}
+.logo-lg{width:min(78vw,340px)}
+
+/* ---------------- en-tête ---------------- */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;
+  justify-content:space-between;gap:20px;padding:12px var(--pad);
+  background:rgba(255,255,255,.9);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);opacity:0;transform:translateY(-14px)}
+.nav{display:flex;gap:clamp(12px,2vw,26px);align-items:center}
+.nav a{font-family:var(--f-display);font-size:13px;font-weight:600;letter-spacing:.02em;
+  padding:8px 2px;position:relative;color:var(--ink)}
+.nav a::after{content:'';position:absolute;left:0;bottom:2px;height:3px;width:0;
+  background:var(--yellow);transition:width .3s var(--ease);border-radius:2px}
+.nav a:hover::after,.nav a.on::after{width:100%}
+.nav .tel{background:var(--red);color:#fff;border-radius:999px;padding:9px 16px}
+.nav .tel::after{display:none}
+@media(max-width:860px){.nav a:not(.tel){display:none}}
+.burger{display:none;font-family:var(--f-display);font-weight:700;font-size:13px;
+  border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;cursor:pointer}
+@media(max-width:860px){.burger{display:block}}
+#drawer{position:fixed;inset:56px 0 auto 0;z-index:59;background:#fff;border-bottom:3px solid var(--yellow);
+  padding:14px var(--pad) 22px;display:none}
+#drawer.open{display:block}
+#drawer a{display:block;font-family:var(--f-display);font-weight:600;padding:10px 0;
+  border-bottom:1px solid var(--line)}
+
+/* ---------------- boutons flottants ---------------- */
+.mini{position:fixed;z-index:95;font-family:var(--f-display);font-size:11.5px;font-weight:600;
+  letter-spacing:.06em;color:var(--ink);background:rgba(255,255,255,.88);border:1px solid var(--line);
+  border-radius:999px;padding:9px 15px;cursor:pointer}
+#skip{right:var(--pad);top:18px}
+#sound{right:var(--pad);bottom:20px}
+
+/* ---------------- hero ---------------- */
+#hero{position:relative;z-index:3;min-height:100vh;min-height:100svh;display:grid;place-items:center;
+  text-align:center;padding:110px var(--pad) 130px}
+.hero-copy{transform:scale(1.1) translateY(1vh);will-change:transform}
+.wordmark{position:relative;display:flex;flex-direction:row;align-items:center;justify-content:center;
+  gap:.16em;flex-wrap:wrap;font-weight:900;font-style:italic;
+  font-size:clamp(34px,9.4vw,116px);line-height:1;letter-spacing:-.03em}
+.wm-word{display:inline-block}
+.wm-baba{background:var(--yellow);color:var(--red);padding:.10em .14em .13em;border-radius:.06em;
+  box-shadow:0 12px 40px rgba(255,196,0,.4)}
+.wm-auto{color:var(--ink)}
+.wm-l{display:inline-block;overflow:hidden;vertical-align:top}
+.wm-l i{display:inline-block;font-style:inherit}
+#sweep{position:absolute;inset:-16% -22%;pointer-events:none;opacity:0;mix-blend-mode:overlay;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 50%,transparent 62%)}
+.tagline{margin:22px 0 0;font-family:var(--f-display);font-size:clamp(11px,1.6vw,14px);
+  font-weight:600;letter-spacing:.3em;color:var(--ink-soft);text-transform:uppercase;
+  opacity:0;transform:translateY(10px)}
+.hero-sub{margin:26px auto 0;max-width:34ch;font-size:clamp(16px,1.5vw,20px);color:var(--ink-soft);
+  opacity:0;transform:translateY(14px)}
+.cta-row{margin-top:30px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta-row>*{opacity:0;transform:translateY(14px)}
+.btn{font-family:var(--f-display);font-size:12.5px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;padding:15px 26px;border-radius:999px;cursor:pointer;border:2px solid transparent;
+  transition:transform .3s var(--ease),box-shadow .3s var(--ease),background .3s,color .3s}
+.btn-primary{background:var(--red);color:#fff;box-shadow:0 10px 26px rgba(224,35,31,.28)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(224,35,31,.36)}
+.btn-ghost{border-color:var(--ink);color:var(--ink)}
+.btn-ghost:hover{background:var(--yellow);border-color:var(--yellow)}
+.scroll-hint{position:absolute;bottom:78px;left:50%;transform:translateX(-50%);opacity:0;
+  font-family:var(--f-display);font-size:10.5px;font-weight:600;letter-spacing:.28em;color:var(--ink-soft)}
+
+/* ---------------- vagues de section ---------------- */
+.wave{position:relative;line-height:0;pointer-events:none;margin-top:-1px}
+.wave svg{width:100%;height:clamp(56px,7vw,110px)}
+.wave.up svg{transform:scaleY(-1)}
+
+/* ---------------- sections ---------------- */
+main{position:relative;z-index:3}
+.sec{padding:clamp(58px,8vw,104px) var(--pad)}
+.sec.bone{background:var(--bone)}
+.sec.white{background:var(--paper)}
+.sec.yellow{background:var(--yellow)}
+.pagehead{padding:clamp(96px,12vw,150px) var(--pad) clamp(28px,4vw,50px);background:var(--bone)}
+.crumb{font-family:var(--f-display);font-size:12px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--red);margin-bottom:10px}
+h1.title{font-size:clamp(30px,6vw,64px);font-weight:800;font-style:italic}
+h2{font-size:clamp(24px,4.2vw,46px);font-weight:800}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:22px;
+  padding-bottom:18px;border-bottom:3px solid var(--yellow);margin-bottom:clamp(28px,4vw,48px);flex-wrap:wrap}
+.sec-note{font-size:16px;color:var(--ink-soft);max-width:38ch;margin:0}
+
+/* ---------------- cartes véhicules ---------------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:clamp(14px,1.8vw,24px)}
+.car-card{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  display:flex;flex-direction:column;transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+.car-card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(23,19,12,.13)}
+.car-art{aspect-ratio:16/8;background:linear-gradient(160deg,var(--yellow) 0%,#FFD84D 100%);
+  display:grid;place-items:center;position:relative}
+.car-art svg{width:84%;filter:drop-shadow(0 8px 12px rgba(0,0,0,.18))}
+.car-badge{position:absolute;top:10px;left:10px;background:var(--ink);color:#fff;
+  font-family:var(--f-display);font-size:10.5px;font-weight:700;letter-spacing:.1em;
+  padding:5px 10px;border-radius:999px;text-transform:uppercase}
+.car-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.car-name{font-size:18px;font-weight:700}
+.car-specs{margin:0;font-size:14px;color:var(--ink-soft)}
+.car-foot{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.price{font-family:var(--f-display);font-weight:800;font-size:21px;color:var(--red)}
+.avail{font-family:var(--f-display);font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--ink-soft)}
+.car-card.emerge{animation:emerge .9s var(--ease) both}
+@keyframes emerge{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:none}}
+
+/* ---------------- tuiles marques / catégories ---------------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.tile{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 16px;
+  display:flex;flex-direction:column;gap:4px;transition:border-color .3s,transform .3s var(--ease)}
+.tile:hover{border-color:var(--red);transform:translateY(-3px)}
+.tile .n{font-family:var(--f-display);font-weight:800;font-size:18px}
+.tile .c{font-family:var(--f-display);font-size:12px;font-weight:600;color:var(--ink-soft)}
+.tile.cat .n{font-size:16px}
+.tile.cat svg{width:100%;margin-bottom:6px;opacity:.85}
+.chiprow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.chip{font-family:var(--f-display);font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;
+  border:1px solid var(--line);background:#fff}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ---------------- étapes / services ---------------- */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:clamp(18px,3vw,40px)}
+.step{border-top:4px solid var(--red);padding-top:16px}
+.step .n{font-family:var(--f-display);font-weight:800;font-size:13px;color:var(--red);letter-spacing:.08em}
+.step h3{margin:10px 0 6px;font-size:19px;font-weight:700}
+.step p{margin:0;font-size:15px;color:var(--ink-soft)}
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.service{background:var(--paper);border-radius:14px;padding:24px;border:1px solid var(--line)}
+.service h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.service p{margin:0;font-size:15px;color:var(--ink-soft)}
+.service .lead{display:inline-block;margin-top:12px;font-family:var(--f-display);font-weight:700;
+  font-size:14px;color:var(--red)}
+
+/* ---------------- contact ---------------- */
+.contact-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:clamp(20px,4vw,50px)}
+.info dt{font-family:var(--f-display);font-size:11px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--red);margin-top:16px}
+.info dd{margin:4px 0 0;font-size:17px}
+footer{background:var(--ink);color:#EFE9DC;padding:36px var(--pad) 44px;
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font-family:var(--f-display);font-size:12.5px}
+footer a{color:var(--yellow)}
+
+/* ---------------- espace connexion / administration ---------------- */
+.auth-wrap{max-width:620px;margin:0 auto}
+.auth-card,.admin-panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:clamp(22px,4vw,38px);box-shadow:0 18px 55px rgba(23,19,12,.08)}
+.auth-card h2,.admin-panel h2{margin-bottom:8px}
+.auth-note{margin:0 0 22px;color:var(--ink-soft)}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.form-grid .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-family:var(--f-display);font-size:12px;font-weight:750;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:13px 14px;font:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+.field textarea{min-height:120px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--yellow-deep);box-shadow:0 0 0 4px rgba(255,196,0,.14)}
+.auth-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn-admin{background:var(--ink);color:#fff}
+.login-link{background:var(--ink);color:#fff!important;border-radius:999px;padding:9px 15px!important}
+.login-link::after{display:none!important}
+.admin-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.admin-status{font-family:var(--f-display);font-size:12px;font-weight:700;background:#E9F8ED;color:#17632C;padding:8px 12px;border-radius:999px}
+.photo-explainer{background:var(--bone);border-left:5px solid var(--yellow);padding:16px 18px;border-radius:12px;margin:18px 0 14px;color:var(--ink-soft)}
+.photo-explainer strong{font-family:var(--f-display);color:var(--ink)}
+.photo-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:18px}
+.photo-slot{position:relative;aspect-ratio:1;border:2px dashed rgba(23,19,12,.2);border-radius:14px;background:var(--bone);overflow:hidden;display:grid;place-items:center;cursor:pointer;transition:border-color .2s,transform .2s}
+.photo-slot:hover{border-color:var(--red);transform:translateY(-2px)}
+.photo-slot input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.photo-slot span{font-family:var(--f-display);font-size:11px;font-weight:750;text-align:center;padding:8px;color:var(--ink-soft);line-height:1.25}
+.photo-slot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo-slot .photo-n{position:absolute;left:6px;top:6px;background:rgba(23,19,12,.88);color:#fff;border-radius:999px;width:23px;height:23px;display:grid;place-items:center;font-family:var(--f-display);font-size:10px;font-weight:800;z-index:2}
+
+.account-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:clamp(22px,4vw,38px);box-shadow:0 18px 55px rgba(23,19,12,.08)}
+.account-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:22px}
+.account-stat{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--bone)}
+.account-stat strong{display:block;font-family:var(--f-display);font-size:28px;line-height:1;color:var(--red);margin-bottom:8px}
+.account-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.auth-switch{margin-top:18px;padding-top:18px;border-top:1px solid var(--line);font-size:14px;color:var(--ink-soft)}
+.auth-switch a{font-family:var(--f-display);font-weight:800;color:var(--red)}
+.auth-msg{display:none;margin:14px 0 0;font-weight:700}
+.auth-msg.ok{color:#17632C}.auth-msg.err{color:var(--red)}
+
+.admin-list{display:grid;gap:12px;margin-top:26px}
+.admin-row{display:grid;grid-template-columns:82px 1fr auto;gap:14px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:10px;background:#fff}
+.admin-thumb{width:82px;aspect-ratio:4/3;border-radius:10px;object-fit:cover;background:var(--yellow)}
+.admin-row h3{font-size:16px}.admin-row p{margin:2px 0 0;color:var(--ink-soft);font-size:13px}
+.small-danger{border:0;background:#FDE9E7;color:#A51D18;border-radius:999px;padding:9px 12px;font-family:var(--f-display);font-weight:700;cursor:pointer}
+.car-art.has-photo{background:#eee}.car-art.has-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.car-art.has-photo svg{display:none}
+.demo-cred{font-family:var(--f-display);font-size:12px;background:#FFF7D1;border:1px solid #F3D86B;border-radius:12px;padding:12px 14px;margin:14px 0;color:#695400}
+@media(max-width:760px){.form-grid{grid-template-columns:1fr}.photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-row{grid-template-columns:68px 1fr}.admin-row .small-danger{grid-column:1/-1}.admin-thumb{width:68px}.login-link{display:none!important}}
+
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+  .hero-copy{transform:none}
+}
+body.no-webgl #stage{background:radial-gradient(110% 80% at 50% 40%,#fff,#EFEBE0)}
+</style>
+</head>
+<body class="intro-lock">
+
+<!-- ===== silhouettes par catégorie ===== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="sil-berline" viewBox="0 0 900 250"><path fill="currentColor" d="M46 198V166c4-22 26-30 62-35 68-9 124-21 178-41 54-20 116-30 184-30 70 0 130 12 180 32 54 22 130 36 176 46 32 7 42 20 42 38v22h-84c-4-38-32-60-64-60s-60 22-64 60H292c-4-38-32-60-64-60s-60 22-64 60z"/></symbol>
+  <symbol id="sil-citadine" viewBox="0 0 900 250"><path fill="currentColor" d="M70 200v-34c4-22 24-30 58-36 52-9 96-22 138-44 46-24 104-34 176-34 74 0 132 12 178 38 42 24 96 42 136 52 30 8 40 20 40 40v18h-88c-4-38-32-60-64-60s-60 22-64 60H286c-4-38-32-60-64-60s-60 22-64 60z"/></symbol>
+  <symbol id="sil-break" viewBox="0 0 900 250"><path fill="currentColor" d="M42 198v-32c4-22 26-30 62-35 68-9 124-21 178-41 54-20 116-30 184-30 78 0 152 14 216 34 46 14 96 22 132 30 30 7 40 20 40 38v36h-96c-4-38-32-60-64-60s-60 22-64 60H288c-4-38-32-60-64-60s-60 22-64 60z"/></symbol>
+  <symbol id="sil-suv" viewBox="0 0 900 250"><path fill="currentColor" d="M40 196v-48c4-24 28-34 66-40 56-8 102-20 150-42 50-24 116-34 196-34 78 0 142 12 194 36 52 24 118 40 158 50 32 8 42 22 42 44v34h-96c-4-40-34-62-66-62s-62 22-66 62H288c-4-40-34-62-66-62s-62 22-66 62z"/></symbol>
+  <symbol id="sil-utilitaire" viewBox="0 0 900 250"><path fill="currentColor" d="M40 196V86c0-16 12-26 30-26h420c22 0 36 8 48 24l70 92c40 8 214 22 244 34 20 8 26 20 26 38v22h-88c-4-38-32-60-64-60s-60 22-64 60H288c-4-38-32-60-64-60s-60 22-64 60z"/></symbol>
+  <symbol id="sil-coupe" viewBox="0 0 900 250"><path fill="currentColor" d="M52 198v-30c4-22 26-30 60-35 74-10 138-26 196-56 62-32 130-46 204-46 66 0 122 16 168 44 48 30 116 48 158 58 30 8 40 20 40 38v27h-88c-4-38-32-60-64-60s-60 22-64 60H290c-4-38-32-60-64-60s-60 22-64 60z"/></symbol>
+
+  <!-- logo BABA AUTO, redessiné d'après l'enseigne -->
+  <symbol id="logo-baba" viewBox="0 0 420 132">
+    <rect x="2" y="2" width="416" height="128" rx="14" fill="#FFC400"/>
+    <path d="M28 40c40-26 118-30 172-10" fill="none" stroke="#E0231F" stroke-width="9" stroke-linecap="round"/>
+    <path d="M40 56c36-20 100-24 148-8" fill="none" stroke="#17130C" stroke-width="6" stroke-linecap="round"/>
+    <path d="M30 100c8-16 22-22 40-22h58c14 0 22 4 30 12l14 10z" fill="#17130C"/>
+    <circle cx="58" cy="102" r="9" fill="#FFC400" stroke="#17130C" stroke-width="4"/>
+    <circle cx="132" cy="102" r="9" fill="#FFC400" stroke="#17130C" stroke-width="4"/>
+    <text x="196" y="92" font-family="Archivo,Arial,sans-serif" font-size="62" font-weight="900"
+          font-style="italic" fill="#E0231F">BABA</text>
+    <text x="196" y="120" font-family="Archivo,Arial,sans-serif" font-size="26" font-weight="800"
+          letter-spacing="10" fill="#17130C">AUTO</text>
+  </symbol>
+</defs></svg>
+
+<!-- ===== loader ===== -->
+<div id="loader" role="status" aria-label="Chargement">
+  <div class="tach">
+    <svg class="loader-logo" viewBox="0 0 420 132" aria-hidden="true"><use href="#logo-baba"/></svg>
+    <svg class="gauge" viewBox="0 0 240 240" aria-hidden="true">
+      <path class="tach-track" id="arcTrack" d=""></path>
+      <path class="tach-red" id="arcRed" d=""></path>
+      <path class="tach-arc" id="arcFill" d="" pathLength="1"></path>
+      <g id="ticks"></g>
+    </svg>
+    <div class="needle" id="needle"></div>
+    <div class="tach-core">
+      <div class="tach-pct"><span id="pct">0</span><span style="font-size:.5em"> %</span></div>
+      <div class="tach-unit">x1000 tr/min</div>
+    </div>
+  </div>
+</div>
+
+<div id="stage" aria-hidden="true"></div>
+<div id="motionblur"></div>
+<div id="waveWipe" aria-hidden="true">
+  <div class="sheet" id="sheetRed"><svg viewBox="0 0 1440 900" preserveAspectRatio="none">
+    <path fill="#E0231F" d="M0 120C220 40 420 190 720 120s500-80 720 0v800H0z"/></svg></div>
+  <div class="sheet" id="sheetYellow"><svg viewBox="0 0 1440 900" preserveAspectRatio="none">
+    <path fill="#FFC400" d="M0 130C240 30 470 200 760 130s480-90 680 10v790H0z"/></svg></div>
+</div>
+<div id="flash"></div>
+
+<button class="mini" id="skip" type="button">Passer l’intro</button>
+<button class="mini" id="sound" type="button" aria-pressed="false">🔊 Activer le son</button>
+
+<header class="site-header">
+  <a href="#/accueil" aria-label="BABA AUTO, accueil"><svg class="logo" viewBox="0 0 420 132"><use href="#logo-baba"/></svg></a>
+  <nav class="nav" id="nav">
+    <a href="#/stock">Stock</a>
+    <a href="#/marques">Marques</a>
+    <a href="#/categories">Catégories</a>
+    <a href="#/reprise">Reprise</a>
+    <a href="#/atelier">Atelier</a>
+    <a href="#/contact">Contact</a>
+    <a class="login-link" href="#/login">Connexion</a>
+    <a class="tel" href="tel:+33615912959">06 15 91 29 59</a>
+    <button class="burger" id="burger" type="button">Menu</button>
+  </nav>
+</header>
+<div id="drawer"></div>
+
+<section id="hero">
+  <div class="hero-copy" id="heroCopy">
+    <h1 class="wordmark">
+      <span class="wm-word wm-baba" data-split>BABA</span>
+      <span class="wm-word wm-auto" data-split>AUTO</span>
+      <span id="sweep"></span>
+    </h1>
+    <p class="tagline">Achat · Vente · Mécanique</p>
+    <p class="hero-sub">Votre prochaine voiture commence ici. Toutes marques, révisées et garanties.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary" id="discover" type="button">Découvrir nos véhicules</button>
+      <a class="btn btn-ghost" href="#/contact">Contacter le garage</a>
+    </div>
+  </div>
+  <div class="scroll-hint">Faites défiler</div>
+</section>
+
+<main id="page"></main>
+
+<footer>
+  <span>BABA AUTO — achat · vente · mécanique, toutes marques</span>
+  <span>4 sentier de la Pointe des 3 … · <a href="tel:+33615912959">06 15 91 29 59</a></span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+var $=function(s,r){return (r||document).querySelector(s);};
+var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));};
+var clamp=function(v,a,b){return v<a?a:(v>b?b:v);};
+var lerp=function(a,b,t){return a+(b-a)*t;};
+var smooth=function(t){return t*t*(3-2*t);};
+var eur=function(n){return n.toLocaleString('fr-FR')+' €';};
+var slug=function(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');};
+
+var reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var isTouch=window.matchMedia('(hover: none)').matches;
+var hasGSAP=typeof gsap!=='undefined';
+function hasWebGL(){try{var c=document.createElement('canvas');
+  return !!(window.WebGLRenderingContext&&(c.getContext('webgl')||c.getContext('experimental-webgl')));}catch(e){return false;}}
+var webgl=hasWebGL()&&typeof THREE!=='undefined';
+
+var CONFIG={ modelUrl:'./model/scene.gltf',
+  dracoPath:'https://www.gstatic.com/draco/versioned/decoders/1.5.6/', minLoadMs:1900, plate:'BABA AUTO' };
+
+/* =========================================================
+   DONNÉES — stock toutes marques
+   ========================================================= */
+var CATS=[
+  {id:'citadine',   label:'Citadines',      sil:'sil-citadine'},
+  {id:'compacte',   label:'Compactes',      sil:'sil-berline'},
+  {id:'berline',    label:'Berlines',       sil:'sil-berline'},
+  {id:'break',      label:'Breaks',         sil:'sil-break'},
+  {id:'suv',        label:'SUV & 4×4',      sil:'sil-suv'},
+  {id:'coupe',      label:'Coupés & sportives', sil:'sil-coupe'},
+  {id:'utilitaire', label:'Utilitaires',    sil:'sil-utilitaire'}
+];
+function V(b,m,c,y,km,e,g,ch,p,av){return {b:b,m:m,c:c,y:y,km:km,e:e,g:g,ch:ch,p:p,av:av||'Disponible'};}
+var STOCK=[];
+
+var BRAND_NAMES=['Alfa Romeo','Audi','BMW','Citroën','Cupra','Dacia','DS','Fiat','Ford','Honda','Hyundai','Kia','Land Rover','Lexus','Mercedes-Benz','Mini','Nissan','Opel','Peugeot','Porsche','Renault','Seat','Škoda','Suzuki','Tesla','Toyota','Volkswagen','Volvo'];
+function buildBrands(){
+  var m={};STOCK.forEach(function(v){m[v.b]=(m[v.b]||0)+1;});
+  return BRAND_NAMES.map(function(b){return {name:b,id:slug(b),count:m[b]||0};});
+}
+var BRANDS=buildBrands();
+function catOf(id){for(var i=0;i<CATS.length;i++) if(CATS[i].id===id) return CATS[i];return CATS[0];}
+function catCount(id){return STOCK.filter(function(v){return v.c===id;}).length;}
+
+/* =========================================================
+   GABARITS HTML
+   ========================================================= */
+function waveHTML(color,up){
+  return '<div class="wave'+(up?' up':'')+'"><svg viewBox="0 0 1440 110" preserveAspectRatio="none">'+
+    '<path fill="'+color+'" d="M0 42c180-56 350 34 570 30 210-4 330-66 520-52 130 10 240 52 350 40v50H0z"/>'+
+    '</svg></div>';
+}
+function cardHTML(v,i){
+  var photo=v.photoUrl||'';
+  return '<article class="car-card reveal" data-i="'+i+'">'+
+    '<div class="car-art'+(photo?' has-photo':'')+'"><span class="car-badge">'+v.b+'</span>'+ 
+      (photo?'<img src="'+photo+'" alt="'+v.b+' '+v.m+'">':'<svg viewBox="0 0 900 250" style="color:#17130C"><use href="#'+catOf(v.c).sil+'"/></svg>')+'</div>'+ 
+    '<div class="car-body">'+
+      '<h3 class="car-name">'+v.b+' '+v.m+'</h3>'+ 
+      '<p class="car-specs">'+v.y+' · '+Number(v.km).toLocaleString('fr-FR')+' km · '+v.e+' · '+v.g+' · '+v.ch+' ch</p>'+ 
+      '<div class="car-foot"><span class="price">'+eur(Number(v.p))+'</span><span class="avail">'+v.av+'</span></div>'+ 
+    '</div></article>';
+}
+
+function gridHTML(list){
+  if(!list.length) return '<p class="sec-note">Aucun véhicule disponible dans cette sélection pour le moment. Le stock est mis à jour régulièrement.</p>';
+  return '<div class="grid">'+list.map(function(v){return cardHTML(v,STOCK.indexOf(v));}).join('')+'</div>';
+}
+function brandTiles(){
+  return '<div class="tiles">'+BRANDS.map(function(b){
+    return '<a class="tile reveal" href="#/marque/'+b.id+'"><span class="n">'+b.name+'</span>'+
+           '<span class="c">'+(b.count?b.count+' véhicule'+(b.count>1?'s':''):'Aucun en stock')+'</span></a>';}).join('')+'</div>';
+}
+function catTiles(){
+  return '<div class="tiles">'+CATS.map(function(c){
+    return '<a class="tile cat reveal" href="#/categorie/'+c.id+'">'+
+      '<svg viewBox="0 0 900 250" style="color:#E0231F"><use href="#'+c.sil+'"/></svg>'+
+      '<span class="n">'+c.label+'</span><span class="c">'+catCount(c.id)+' véhicule'+(catCount(c.id)>1?'s':'')+'</span></a>';
+  }).join('')+'</div>';
+}
+var REPRISE='<div class="steps">'+
+  '<div class="step reveal"><span class="n">Étape 1</span><h3>Vous décrivez la voiture</h3>'+
+  '<p>Modèle, année, kilométrage, historique d’entretien. Cinq minutes au téléphone suffisent.</p></div>'+
+  '<div class="step reveal"><span class="n">Étape 2</span><h3>On estime sous 24 heures</h3>'+
+  '<p>Un prix ferme, écrit, valable trente jours. Aucune décote surprise au moment de signer.</p></div>'+
+  '<div class="step reveal"><span class="n">Étape 3</span><h3>On reprend ou on rachète</h3>'+
+  '<p>Déduction sur votre prochain véhicule, ou virement sous 48 heures. Carte grise gérée par nos soins.</p></div></div>';
+var ATELIER='<div class="services">'+
+  '<div class="service reveal"><h3>Entretien courant</h3><p>Révision, freins, distribution, climatisation, sur toutes les marques. Devis validé avant toute intervention.</p><span class="lead">À partir de 89 €</span></div>'+
+  '<div class="service reveal"><h3>Diagnostic électronique</h3><p>Lecture des calculateurs, recherche de panne, remise à zéro des voyants. Compte rendu remis en main propre.</p><span class="lead">Sous 2 heures</span></div>'+
+  '<div class="service reveal"><h3>Carrosserie et esthétique</h3><p>Débosselage sans peinture, retouche, polissage, rénovation d’optiques.</p><span class="lead">Sur rendez-vous</span></div></div>';
+var CONTACT='<div class="contact-wrap">'+
+  '<dl class="info reveal"><dt>Adresse</dt><dd>4 sentier de la Pointe des 3 …</dd>'+
+  '<dt>Téléphone</dt><dd><a href="tel:+33615912959">06 15 91 29 59</a></dd>'+
+  '<dt>Courriel</dt><dd><a href="mailto:contact@babaauto.fr">contact@babaauto.fr</a></dd></dl>'+
+  '<dl class="info reveal"><dt>Horaires</dt><dd>Lundi – vendredi, 8 h 30 – 19 h</dd><dd>Samedi, 9 h – 17 h</dd>'+
+  '<dt>Marques suivies</dt><dd>Toutes marques, achat, vente et mécanique</dd>'+
+  '<dt>Essais</dt><dd>Tous les véhicules du stock sont essayables, sans engagement.</dd></dl></div>';
+
+function sec(cls,inner){return '<section class="sec '+cls+'">'+inner+'</section>';}
+function head(title,note){return '<div class="sec-head reveal"><h2>'+title+'</h2>'+
+  (note?'<p class="sec-note">'+note+'</p>':'')+'</div>';}
+
+function pageAccueil(){
+  var latest=STOCK.slice(0,6);
+  return waveHTML('#FFC400')+
+    sec('white','<div id="stock">'+head('Véhicules disponibles',
+        STOCK.length ? 'Découvrez les véhicules actuellement proposés par BABA AUTO.' : 'Le stock est en cours de mise à jour. Les véhicules ajoutés depuis l’espace administrateur apparaîtront ici automatiquement.')+
+        gridHTML(latest)+
+        '<p style="margin-top:26px"><a class="btn btn-ghost" href="#/stock">Voir tout le stock</a></p></div>')+
+    waveHTML('#E0231F')+
+    sec('bone',head('Toutes les marques','Accédez à chaque marque et retrouvez automatiquement les véhicules disponibles dès qu’ils sont ajoutés au stock.')+brandTiles())+
+    waveHTML('#FFC400',true)+
+    sec('white',head('Par catégorie','De la citadine au utilitaire, en passant par les breaks et les sportives.').replace('au utilitaire','à l’utilitaire')+catTiles())+
+    waveHTML('#E0231F')+
+    sec('bone',head('Reprise','Vous partez avec un chèque ou une nouvelle voiture le jour même.')+REPRISE)+
+    waveHTML('#FFC400',true)+
+    sec('white',head('Atelier','Le même atelier prépare les voitures du stock et entretient la vôtre.')+ATELIER)+
+    waveHTML('#E0231F')+
+    sec('bone',head('Contact','Passez sans rendez-vous pendant les heures d’ouverture, ou appelez : quelqu’un décroche.')+CONTACT);
+}
+function pageHead(crumb,title,note){
+  return '<div class="pagehead"><p class="crumb">'+crumb+'</p><h1 class="title">'+title+'</h1>'+
+    (note?'<p class="sec-note" style="margin-top:12px;max-width:52ch">'+note+'</p>':'')+'</div>'+waveHTML('#FFC400');
+}
+function pageStock(){
+  return pageHead('Stock','Tous nos véhicules',STOCK.length ? STOCK.length+' véhicule'+(STOCK.length>1?'s':'')+' disponible'+(STOCK.length>1?'s':'')+'.' : 'Aucun véhicule en ligne pour le moment. Le stock sera alimenté depuis l’espace administrateur.')+
+    sec('white','<div class="chiprow">'+CATS.map(function(c){
+      return '<a class="chip" href="#/categorie/'+c.id+'">'+c.label+'</a>';}).join('')+'</div>'+gridHTML(STOCK));
+}
+function pageMarques(){
+  return pageHead('Marques','Toutes les marques suivies','Retrouvez les marques suivies par BABA AUTO. Les pages restent accessibles même lorsqu’aucun véhicule n’est actuellement en stock.')+
+    sec('white',brandTiles());
+}
+function pageCategories(){
+  return pageHead('Catégories','Par type de véhicule','Sept familles, du petit citadin à l’utilitaire de chantier.')+
+    sec('white',catTiles());
+}
+function pageMarque(id){
+  var b=null;BRANDS.forEach(function(x){if(x.id===id)b=x;});
+  if(!b) return page404();
+  var list=STOCK.filter(function(v){return v.b===b.name;});
+  return pageHead('Marque',b.name,b.count+' véhicule'+(b.count>1?'s':'')+' '+b.name+' en stock. Entretien, diagnostic et pièces également assurés sur cette marque.')+
+    sec('white',gridHTML(list))+waveHTML('#E0231F')+
+    sec('bone',head('Autres marques')+brandTiles());
+}
+function pageCategorie(id){
+  var c=null;CATS.forEach(function(x){if(x.id===id)c=x;});
+  if(!c) return page404();
+  var list=STOCK.filter(function(v){return v.c===c.id;});
+  return pageHead('Catégorie',c.label,list.length+' véhicule'+(list.length>1?'s':'')+' dans cette catégorie, toutes marques confondues.')+
+    sec('white',gridHTML(list))+waveHTML('#E0231F')+
+    sec('bone',head('Autres catégories')+catTiles());
+}
+function page404(){
+  return pageHead('Page introuvable','Cette page n’existe pas','Le lien a peut-être changé. Reprenez par le stock complet.')+
+    sec('white','<a class="btn btn-primary" href="#/stock">Voir le stock</a>');
+}
+
+
+/* =========================================================
+   CONNEXION + ADMIN — démo locale
+   En production : authentification serveur + base de données + stockage objet.
+   ========================================================= */
+var ADMIN_AUTH_KEY='baba_admin_auth';
+var adminPhotos=new Array(10).fill(null);
+var ADMIN_VEHICLES=[];
+
+function isAdmin(){try{return sessionStorage.getItem(ADMIN_AUTH_KEY)==='1';}catch(e){return false;}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+
+var CLIENTS_KEY='baba_clients_demo';
+var CLIENT_SESSION_KEY='baba_client_session';
+
+function getClients(){
+  try{return JSON.parse(localStorage.getItem(CLIENTS_KEY)||'[]')||[];}catch(e){return [];}
+}
+function saveClients(a){
+  try{localStorage.setItem(CLIENTS_KEY,JSON.stringify(a));}catch(e){}
+}
+function getClientSession(){
+  try{return JSON.parse(sessionStorage.getItem(CLIENT_SESSION_KEY)||'null');}catch(e){return null;}
+}
+function setClientSession(c){
+  try{sessionStorage.setItem(CLIENT_SESSION_KEY,JSON.stringify({name:c.name,email:c.email}));}catch(e){}
+}
+function clearClientSession(){
+  try{sessionStorage.removeItem(CLIENT_SESSION_KEY);}catch(e){}
+}
+
+function pageLogin(){
+  var me=getClientSession();
+  if(me) return pageAccount();
+  return pageHead('Espace client','Se connecter','Retrouvez vos favoris et vos demandes envoyées à BABA AUTO.')+
+    sec('white','<div class="auth-wrap"><form class="auth-card reveal" id="clientLoginForm">'+
+    '<h2>Connexion client</h2><p class="auth-note">Connectez-vous avec votre adresse e-mail.</p>'+
+    '<div class="form-grid">'+
+      '<div class="field full"><label>Adresse e-mail</label><input id="clientEmail" type="email" autocomplete="email" placeholder="vous@exemple.fr" required></div>'+
+      '<div class="field full"><label>Mot de passe</label><input id="clientPass" type="password" autocomplete="current-password" required></div>'+
+    '</div>'+
+    '<div class="auth-actions"><button class="btn btn-primary" type="submit">Se connecter</button>'+
+      '<a class="btn btn-ghost" href="#/inscription">Créer un compte</a></div>'+
+    '<p class="auth-switch"><a href="#/mot-de-passe-oublie">Mot de passe oublié ?</a></p>'+
+    '<p id="clientLoginMsg" class="auth-msg err">Adresse e-mail ou mot de passe incorrect.</p>'+
+    '<div class="auth-switch">Vous travaillez chez BABA AUTO ? <a href="#/admin-login">Accès administrateur</a></div>'+
+    '</form></div>');
+}
+
+function pageRegister(){
+  if(getClientSession()) return pageAccount();
+  return pageHead('Espace client','Créer un compte','Inscription rapide pour enregistrer vos favoris et suivre vos demandes.')+
+    sec('white','<div class="auth-wrap"><form class="auth-card reveal" id="clientRegisterForm">'+
+    '<h2>Inscription</h2><p class="auth-note">Créez gratuitement votre espace BABA AUTO.</p>'+
+    '<div class="form-grid">'+
+      '<div class="field"><label>Prénom et nom</label><input id="regName" autocomplete="name" required></div>'+
+      '<div class="field"><label>Téléphone</label><input id="regPhone" type="tel" autocomplete="tel" placeholder="06 00 00 00 00"></div>'+
+      '<div class="field full"><label>Adresse e-mail</label><input id="regEmail" type="email" autocomplete="email" required></div>'+
+      '<div class="field"><label>Mot de passe</label><input id="regPass" type="password" minlength="6" autocomplete="new-password" required></div>'+
+      '<div class="field"><label>Confirmer le mot de passe</label><input id="regPass2" type="password" minlength="6" autocomplete="new-password" required></div>'+
+    '</div>'+
+    '<label style="display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:14px"><input id="regConsent" type="checkbox" required style="width:auto;margin-top:5px"> <span>J’accepte la création de mon compte de démonstration BABA AUTO.</span></label>'+
+    '<div class="auth-actions"><button class="btn btn-primary" type="submit">Créer mon compte</button>'+
+      '<a class="btn btn-ghost" href="#/login">J’ai déjà un compte</a></div>'+
+    '<p id="registerMsg" class="auth-msg err"></p>'+
+    '<div class="auth-switch">Accès réservé à l’équipe ? <a href="#/admin-login">Connexion administrateur</a></div>'+
+    '</form></div>');
+}
+
+function pageForgot(){
+  return pageHead('Espace client','Mot de passe oublié','Saisissez votre adresse e-mail pour lancer la récupération du compte.')+
+    sec('white','<div class="auth-wrap"><form class="auth-card reveal" id="forgotForm">'+
+    '<h2>Réinitialiser l’accès</h2><p class="auth-note">Pour cette démonstration, aucun e-mail réel n’est envoyé.</p>'+
+    '<div class="form-grid"><div class="field full"><label>Adresse e-mail</label><input id="forgotEmail" type="email" autocomplete="email" required></div></div>'+
+    '<div class="auth-actions"><button class="btn btn-primary" type="submit">Envoyer le lien</button><a class="btn btn-ghost" href="#/login">Retour</a></div>'+
+    '<p id="forgotMsg" class="auth-msg ok"></p>'+
+    '</form></div>');
+}
+
+function pageAccount(){
+  var me=getClientSession();
+  if(!me) return pageLogin();
+  return pageHead('Espace client','Bonjour '+esc(me.name||'') ,'Votre espace personnel BABA AUTO.')+
+    sec('white','<div class="account-card reveal">'+
+      '<div class="admin-top"><div><h2>Mon compte</h2><p class="auth-note">'+esc(me.email||'')+'</p></div><span class="admin-status">● Connecté</span></div>'+
+      '<div class="account-grid">'+
+        '<div class="account-stat"><strong>0</strong>Favoris enregistrés</div>'+
+        '<div class="account-stat"><strong>0</strong>Demandes envoyées</div>'+
+        '<div class="account-stat"><strong>0</strong>Véhicules récemment consultés</div>'+
+      '</div>'+
+      '<div class="account-links"><a class="btn btn-primary" href="#/stock">Voir le stock</a><button class="btn btn-ghost" id="logoutClient" type="button">Se déconnecter</button></div>'+
+    '</div>');
+}
+
+function pageAdminLogin(){
+  if(isAdmin()) return pageAdmin();
+  return pageHead('Administration','Connexion administrateur','Accès réservé à l’équipe BABA AUTO.')+
+    sec('white','<div class="auth-wrap"><form class="auth-card reveal" id="adminLoginForm"><h2>Administration</h2>'+ 
+    '<p class="auth-note">Connectez-vous pour ajouter ou retirer des véhicules du stock.</p>'+ 
+    '<div class="demo-cred">Accès administrateur de démonstration : identifiant <strong>admin</strong> · mot de passe <strong>baba2026</strong>. À remplacer par une vraie authentification serveur avant mise en ligne.</div>'+ 
+    '<div class="form-grid"><div class="field full"><label>Identifiant</label><input id="adminUser" autocomplete="username" required></div>'+ 
+    '<div class="field full"><label>Mot de passe</label><input id="adminPass" type="password" autocomplete="current-password" required></div></div>'+ 
+    '<div class="auth-actions"><button class="btn btn-primary" type="submit">Se connecter</button><a class="btn btn-ghost" href="#/login">Retour</a></div>'+ 
+    '<p id="adminLoginError" style="color:var(--red);font-weight:700;display:none;margin:14px 0 0">Identifiants incorrects.</p></form></div>');
+}
+
+function photoSlotsHTML(){
+  var out='<div class="photo-grid">';
+  for(var i=0;i<10;i++) out+='<label class="photo-slot" id="photoSlot'+i+'"><span class="photo-n">'+(i+1)+'</span><span>Photo '+(i+1)+'<br><small>Appuyer pour choisir</small></span><input type="file" accept="image/*" data-photo="'+i+'"></label>';
+  return out+'</div>';
+}
+
+function pageAdmin(){
+  if(!isAdmin()) return pageAdminLogin();
+  return pageHead('Administration','Gestion du stock','Ajoutez un véhicule et jusqu’à 10 photos. Les ajouts de cette démo sont sauvegardés sur cet appareil.')+
+    sec('bone','<div class="admin-panel"><div class="admin-top"><div><h2>Ajouter un véhicule en vente</h2><p class="auth-note">Renseignez précisément les informations visibles par les clients.</p></div><span class="admin-status">● Administrateur connecté</span></div>'+ 
+    '<div class="photo-explainer"><strong>Photos du véhicule</strong><br>Ajoutez jusqu’à 10 photos. La photo n°1 sera utilisée comme photo principale dans le stock. Pour une annonce propre : extérieur avant/arrière, côtés, intérieur, compteur, coffre et éventuels défauts.</div>'+photoSlotsHTML()+
+    '<form id="vehicleForm"><div class="form-grid">'+
+    '<div class="field"><label>Marque</label><input id="vBrand" required placeholder="BMW"></div>'+ 
+    '<div class="field"><label>Modèle</label><input id="vModel" required placeholder="M3 Compétition G80"></div>'+ 
+    '<div class="field"><label>Catégorie</label><select id="vCat">'+CATS.map(function(c){return '<option value="'+c.id+'">'+c.label+'</option>';}).join('')+'</select></div>'+ 
+    '<div class="field"><label>Année</label><input id="vYear" type="number" min="1950" max="2030" required placeholder="2023"></div>'+ 
+    '<div class="field"><label>Kilométrage</label><input id="vKm" type="number" min="0" required placeholder="24800"></div>'+ 
+    '<div class="field"><label>Carburant</label><select id="vFuel"><option>Essence</option><option>Diesel</option><option>Hybride</option><option>Électrique</option><option>GPL</option></select></div>'+ 
+    '<div class="field"><label>Boîte de vitesses</label><input id="vGear" required placeholder="BVA 8"></div>'+ 
+    '<div class="field"><label>Puissance (ch)</label><input id="vPower" type="number" min="1" required placeholder="510"></div>'+ 
+    '<div class="field"><label>Prix (€)</label><input id="vPrice" type="number" min="0" required placeholder="94900"></div>'+ 
+    '<div class="field"><label>Statut</label><select id="vAvail"><option>Disponible</option><option>Arrivée prochaine</option><option>Réservé</option></select></div>'+ 
+    '<div class="field full"><label>Description</label><textarea id="vDesc" placeholder="Entretien, options, historique, état général…"></textarea></div></div>'+ 
+    '<div class="auth-actions"><button class="btn btn-primary" type="submit">Ajouter au stock</button><button class="btn btn-ghost" id="logoutAdmin" type="button">Déconnexion</button></div></form>'+ 
+    '<div class="admin-list" id="adminVehicleList"></div></div>');
+}
+
+function openAdminDB(){
+  return new Promise(function(resolve,reject){
+    if(!window.indexedDB){resolve(null);return;}
+    var req=indexedDB.open('BabaAutoDB',1);
+    req.onupgradeneeded=function(){var db=req.result;if(!db.objectStoreNames.contains('vehicles')) db.createObjectStore('vehicles',{keyPath:'id'});};
+    req.onsuccess=function(){resolve(req.result);}; req.onerror=function(){reject(req.error);};
+  });
+}
+function dbAll(){return openAdminDB().then(function(db){return new Promise(function(resolve){if(!db){resolve([]);return;}var r=db.transaction('vehicles','readonly').objectStore('vehicles').getAll();r.onsuccess=function(){resolve(r.result||[]);};r.onerror=function(){resolve([]);};});});}
+function dbPut(v){return openAdminDB().then(function(db){return new Promise(function(resolve,reject){if(!db){resolve();return;}var r=db.transaction('vehicles','readwrite').objectStore('vehicles').put(v);r.onsuccess=function(){resolve();};r.onerror=function(){reject(r.error);};});});}
+function dbDelete(id){return openAdminDB().then(function(db){return new Promise(function(resolve){if(!db){resolve();return;}var r=db.transaction('vehicles','readwrite').objectStore('vehicles').delete(id);r.onsuccess=r.onerror=function(){resolve();};});});}
+function refreshAdminVehicles(){
+  ADMIN_VEHICLES.forEach(function(v){if(v.photoUrl) URL.revokeObjectURL(v.photoUrl);});
+  return dbAll().then(function(rows){ADMIN_VEHICLES=rows.map(function(r){var x=Object.assign({},r);if(r.photos&&r.photos[0])x.photoUrl=URL.createObjectURL(r.photos[0]);return x;}); rebuildCombinedStock();});
+}
+function rebuildCombinedStock(){
+  var base=STOCK.filter(function(v){return !v._admin;});
+  ADMIN_VEHICLES.forEach(function(v){var c=Object.assign({},v);c._admin=true;base.unshift(c);});
+  STOCK.length=0;base.forEach(function(v){STOCK.push(v);});
+  BRANDS=buildBrands();
+}
+function renderAdminList(){
+  var box=$('#adminVehicleList'); if(!box)return;
+  var mine=STOCK.filter(function(v){return v._admin;});
+  box.innerHTML='<h2 style="margin-top:12px">Véhicules ajoutés</h2>'+(mine.length?mine.map(function(v){return '<div class="admin-row">'+(v.photoUrl?'<img class="admin-thumb" src="'+v.photoUrl+'">':'<div class="admin-thumb"></div>')+'<div><h3>'+esc(v.b)+' '+esc(v.m)+'</h3><p>'+esc(v.y)+' · '+Number(v.km).toLocaleString('fr-FR')+' km · '+eur(Number(v.p))+'</p></div><button class="small-danger" data-del="'+esc(v.id)+'">Supprimer</button></div>';}).join(''):'<p class="auth-note">Aucun véhicule ajouté depuis l’administration pour le moment.</p>');
+  $$('[data-del]',box).forEach(function(b){b.onclick=function(){if(confirm('Supprimer ce véhicule du stock ?')) dbDelete(this.getAttribute('data-del')).then(function(){refreshAdminVehicles().then(renderAdminList);});};});
+}
+function bindAdminPages(){
+
+  var clf=$('#clientLoginForm');
+  if(clf) clf.onsubmit=function(e){
+    e.preventDefault();
+    var email=$('#clientEmail').value.trim().toLowerCase(),pass=$('#clientPass').value;
+    var users=getClients(),found=null;
+    users.forEach(function(u){if((u.email||'').toLowerCase()===email&&u.password===pass)found=u;});
+    if(found){setClientSession(found);location.hash='#/compte';}
+    else $('#clientLoginMsg').style.display='block';
+  };
+
+  var crf=$('#clientRegisterForm');
+  if(crf) crf.onsubmit=function(e){
+    e.preventDefault();
+    var name=$('#regName').value.trim(),phone=$('#regPhone').value.trim(),
+        email=$('#regEmail').value.trim().toLowerCase(),p1=$('#regPass').value,p2=$('#regPass2').value,
+        msg=$('#registerMsg');
+    msg.className='auth-msg err'; msg.style.display='block';
+    if(p1!==p2){msg.textContent='Les deux mots de passe ne correspondent pas.';return;}
+    if(p1.length<6){msg.textContent='Choisissez un mot de passe d’au moins 6 caractères.';return;}
+    var users=getClients();
+    if(users.some(function(u){return (u.email||'').toLowerCase()===email;})){msg.textContent='Un compte existe déjà avec cette adresse e-mail.';return;}
+    var u={id:'client-'+Date.now(),name:name,phone:phone,email:email,password:p1,createdAt:Date.now()};
+    users.push(u); saveClients(users); setClientSession(u); location.hash='#/compte';
+  };
+
+  var ff=$('#forgotForm');
+  if(ff) ff.onsubmit=function(e){
+    e.preventDefault();
+    var email=$('#forgotEmail').value.trim().toLowerCase(),users=getClients(),exists=users.some(function(u){return (u.email||'').toLowerCase()===email;});
+    var m=$('#forgotMsg');m.style.display='block';
+    m.textContent=exists?'Démo : le compte a bien été trouvé. En production, un lien sécurisé serait envoyé par e-mail.':'Si un compte correspond à cette adresse, un lien de réinitialisation sera envoyé.';
+  };
+
+  var lco=$('#logoutClient');
+  if(lco) lco.onclick=function(){clearClientSession();location.hash='#/login';};
+
+  var lf=$('#adminLoginForm'); if(lf) lf.onsubmit=function(e){e.preventDefault();if($('#adminUser').value==='admin'&&$('#adminPass').value==='baba2026'){try{sessionStorage.setItem(ADMIN_AUTH_KEY,'1');}catch(x){} location.hash='#/admin';}else $('#adminLoginError').style.display='block';};
+  var vf=$('#vehicleForm');
+  if(vf){
+    $$('input[type=file][data-photo]').forEach(function(inp){inp.onchange=function(){var i=Number(this.dataset.photo),f=this.files&&this.files[0];if(!f)return;adminPhotos[i]=f;var slot=$('#photoSlot'+i),old=slot.querySelector('img');if(old)old.remove();var im=document.createElement('img');im.src=URL.createObjectURL(f);slot.appendChild(im);};});
+    vf.onsubmit=function(e){e.preventDefault();var v={id:'admin-'+Date.now(),b:$('#vBrand').value.trim(),m:$('#vModel').value.trim(),c:$('#vCat').value,y:Number($('#vYear').value),km:Number($('#vKm').value),e:$('#vFuel').value,g:$('#vGear').value.trim(),ch:Number($('#vPower').value),p:Number($('#vPrice').value),av:$('#vAvail').value,desc:$('#vDesc').value.trim(),photos:adminPhotos.filter(Boolean),createdAt:Date.now()};dbPut(v).then(function(){adminPhotos=new Array(10).fill(null);return refreshAdminVehicles();}).then(function(){alert('Véhicule ajouté au stock.');render();});};
+    var lo=$('#logoutAdmin');if(lo)lo.onclick=function(){try{sessionStorage.removeItem(ADMIN_AUTH_KEY);}catch(e){}location.hash='#/admin-login';};
+    renderAdminList();
+  }
+}
+
+/* =========================================================
+   ROUTEUR
+   ========================================================= */
+var firstRoute=true;
+function currentRoute(){
+  var h=location.hash.replace(/^#\/?/,'');
+  return h?h.split('/'):['accueil'];
+}
+function render(){
+  var r=currentRoute(), key=r[0], html, home=(key==='accueil');
+  if(home) html=pageAccueil();
+  else if(key==='stock') html=pageStock();
+  else if(key==='marques') html=pageMarques();
+  else if(key==='categories') html=pageCategories();
+  else if(key==='marque') html=pageMarque(r[1]||'');
+  else if(key==='categorie') html=pageCategorie(r[1]||'');
+  else if(key==='reprise') html=pageHead('Service','Reprise et rachat','Estimation ferme sous 24 heures, paiement sous 48 heures.')+sec('white',REPRISE);
+  else if(key==='atelier') html=pageHead('Service','Atelier mécanique','Toutes marques, devis avant intervention.')+sec('white',ATELIER);
+  else if(key==='contact') html=pageHead('Contact','Nous trouver','Sans rendez-vous pendant les heures d’ouverture.')+sec('white',CONTACT);
+  else if(key==='login') html=pageLogin();
+  else if(key==='inscription') html=pageRegister();
+  else if(key==='mot-de-passe-oublie') html=pageForgot();
+  else if(key==='compte') html=pageAccount();
+  else if(key==='admin-login') html=pageAdminLogin();
+  else if(key==='admin') html=pageAdmin();
+  else html=page404();
+
+  $('#page').innerHTML=html;
+  var loginNav=$('.login-link');
+  if(loginNav){
+    var clientSession=getClientSession();
+    loginNav.textContent=clientSession?'Mon compte':'Connexion';
+    loginNav.setAttribute('href',clientSession?'#/compte':'#/login');
+  }
+  document.body.classList.toggle('page-inner',!home);
+  $('#hero').style.display=home?'':'none';
+  $$('#nav a').forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#/'+key);});
+  $('#drawer').classList.remove('open');
+  observeReveals();
+  bindAdminPages();
+  if(!firstRoute){ window.scrollTo(0,0); }
+  firstRoute=false;
+  if(!home) state.paused=true; else state.paused=false;
+}
+window.addEventListener('hashchange',render);
+
+var io=null;
+function observeReveals(){
+  if(!('IntersectionObserver' in window)){ $$('.reveal').forEach(function(e){e.classList.add('in');}); return; }
+  if(io) io.disconnect();
+  io=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},
+    {threshold:.12,rootMargin:'0px 0px -6% 0px'});
+  $$('.reveal').forEach(function(e){io.observe(e);});
+}
+
+/* menu mobile */
+$('#burger').addEventListener('click',function(){
+  var d=$('#drawer');
+  if(!d.innerHTML){
+    var me=getClientSession();
+    var links=[
+      ['stock','Stock'],['marques','Marques'],['categories','Catégories'],['reprise','Reprise'],
+      ['atelier','Atelier'],['contact','Contact'],[me?'compte':'login',me?'Mon compte':'Connexion']
+    ];
+    d.innerHTML=links.map(function(x){return '<a href="#/'+x[0]+'">'+x[1]+'</a>';}).join('');
+  }
+  d.classList.toggle('open');
+});
+
+/* =========================================================
+   AUDIO — moteur synthétisé, uniquement sur geste utilisateur
+   ========================================================= */
+var Engine=(function(){
+  var ctx=null,on=false,master,filt,oscA,oscB,noiseGain;
+  function build(){
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+    ctx=new AC();
+    master=ctx.createGain(); master.gain.value=.0001;
+    filt=ctx.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=420; filt.Q.value=3;
+    var sat=ctx.createWaveShaper(),curve=new Float32Array(1024);
+    for(var i=0;i<1024;i++){var x=i/512-1;curve[i]=Math.tanh(x*2.2);} sat.curve=curve;
+    oscA=ctx.createOscillator(); oscA.type='sawtooth';
+    oscB=ctx.createOscillator(); oscB.type='square'; oscB.detune.value=9;
+    var gA=ctx.createGain(); gA.gain.value=.5; var gB=ctx.createGain(); gB.gain.value=.2;
+    var buf=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),d=buf.getChannelData(0);
+    for(var j=0;j<d.length;j++) d[j]=(Math.random()*2-1)*.5;
+    var noise=ctx.createBufferSource(); noise.buffer=buf; noise.loop=true;
+    noiseGain=ctx.createGain(); noiseGain.gain.value=.05;
+    var bp=ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=900; bp.Q.value=.7;
+    oscA.connect(gA); oscB.connect(gB); gA.connect(filt); gB.connect(filt);
+    noise.connect(bp); bp.connect(noiseGain); noiseGain.connect(filt);
+    filt.connect(sat); sat.connect(master); master.connect(ctx.destination);
+    oscA.start(); oscB.start(); noise.start(); return true;
+  }
+  return {
+    toggle:function(){
+      if(!on){ if(!ctx&&!build()) return false; if(ctx.state==='suspended') ctx.resume();
+        on=true; master.gain.setTargetAtTime(.15,ctx.currentTime,.25); }
+      else { on=false; master.gain.setTargetAtTime(.0001,ctx.currentTime,.18); }
+      return on;
+    },
+    setRPM:function(v){
+      if(!on||!ctx) return;
+      var f=clamp(v,600,7400)/60*4,t=ctx.currentTime;
+      oscA.frequency.setTargetAtTime(f,t,.05);
+      oscB.frequency.setTargetAtTime(f*.5,t,.05);
+      filt.frequency.setTargetAtTime(260+v*.26,t,.07);
+      noiseGain.gain.setTargetAtTime(.02+v/7400*.09,t,.1);
+    },
+    blip:function(){ if(!on||!ctx) return;
+      master.gain.cancelScheduledValues(ctx.currentTime);
+      master.gain.setTargetAtTime(.25,ctx.currentTime,.04);
+      master.gain.setTargetAtTime(.13,ctx.currentTime+.5,.4); }
+  };
+})();
+$('#sound').addEventListener('click',function(){
+  var s=Engine.toggle();
+  this.setAttribute('aria-pressed',s?'true':'false');
+  this.textContent=s?'🔇 Couper le son':'🔊 Activer le son';
+  if(s) Engine.setRPM(1000);
+});
+
+/* =========================================================
+   LOADER — compte-tours
+   ========================================================= */
+var Tach=(function(){
+  var R=96,CX=120,CY=120,A0=135,SPAN=270,MAX=8000;
+  function pol(r,deg){var a=(deg-90)*Math.PI/180;return [CX+r*Math.cos(a),CY+r*Math.sin(a)];}
+  function arc(r,f,t){var p0=pol(r,f),p1=pol(r,t),lg=(t-f)>180?1:0;
+    return 'M'+p0[0].toFixed(2)+' '+p0[1].toFixed(2)+' A'+r+' '+r+' 0 '+lg+' 1 '+p1[0].toFixed(2)+' '+p1[1].toFixed(2);}
+  return {
+    build:function(){
+      $('#arcTrack').setAttribute('d',arc(R,A0,A0+SPAN));
+      $('#arcFill').setAttribute('d',arc(R,A0,A0+SPAN));
+      $('#arcRed').setAttribute('d',arc(R-9,A0+SPAN*(6500/MAX),A0+SPAN));
+      var out='';
+      for(var i=0;i<=16;i++){
+        var major=i%2===0,deg=A0+SPAN*(i/16),a=pol(R-10,deg),b=pol(R-(major?24:17),deg);
+        out+='<line class="tach-tick'+(major?' major':'')+'" x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+
+             '" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'"/>';
+        if(major){var t=pol(R-38,deg);out+='<text class="tach-num" x="'+t[0].toFixed(1)+'" y="'+t[1].toFixed(1)+'">'+(i/2)+'</text>';}
+      }
+      $('#ticks').innerHTML=out;
+    },
+    set:function(p,rpm){
+      $('#arcFill').style.strokeDashoffset=String(1-clamp(p,0,1));
+      $('#needle').style.transform='translate(-50%,-100%) rotate('+(-135+270*clamp(rpm/MAX,0,1))+'deg)';
+      $('#pct').textContent=Math.round(clamp(p,0,1)*100);
+    }
+  };
+})();
+var loadP=0,loadTarget=0,loadStart=performance.now(),loaderDone=false;
+function bump(v){loadTarget=Math.max(loadTarget,v);}
+function loaderTick(){
+  if(loaderDone) return;
+  var el=performance.now()-loadStart,cap=clamp(el/CONFIG.minLoadMs,0,1);
+  loadP=lerp(loadP,Math.min(loadTarget,cap),.09);
+  var rpm=700+loadP*4300+Math.sin(el/90)*150*(.25+loadP*.75);
+  Tach.set(loadP,rpm); Engine.setRPM(rpm);
+  if(loadP>.995&&loadTarget>=1&&cap>=1){ finishLoad(); return; }
+  requestAnimationFrame(loaderTick);
+}
+function finishLoad(){
+  if(loaderDone) return; loaderDone=true;
+  var rev={rpm:5000},up=function(){Tach.set(1,rev.rpm);Engine.setRPM(rev.rpm);};
+  if(hasGSAP&&!reduced){
+    gsap.to(rev,{rpm:6300,duration:.42,ease:'power3.out',onUpdate:up,onComplete:function(){
+      gsap.to(rev,{rpm:1100,duration:.9,ease:'power2.out',onUpdate:up});}});
+  } else Tach.set(1,6300);
+  Engine.blip();
+  setTimeout(start,reduced?60:420);
+}
+function start(){
+  var l=$('#loader'); l.classList.add('gone');
+  setTimeout(function(){l.style.display='none';},620);
+  var home=currentRoute()[0]==='accueil';
+  if(!webgl||reduced||!hasGSAP||!home) endIntro(true); else intro.play(0);
+}
+
+/* =========================================================
+   SCÈNE 3D — studio blanc
+   ========================================================= */
+var renderer,scene,camera,car,carPivot,streaks,dust,lights={},mats={},fx={};
+var rig={r:26,theta:.05,phi:.06,tx:0,tz:0,ly:.78,fov:30,shake:0};
+var HERO={r:9.2,theta:-.95,phi:.16,ly:.74,fov:38};
+var pointer={x:0,y:0,lx:0,ly:0},gyro={x:0,y:0};
+var state={speed:0,scrollP:0,introDone:false,hidden:false,paused:false,camLocked:false,dpr:1,q:1};
+
+function radialTex(inner){
+  var c=document.createElement('canvas');c.width=c.height=128;var g=c.getContext('2d');
+  var r=g.createRadialGradient(64,64,0,64,64,64);
+  r.addColorStop(0,'rgba(255,255,255,'+(inner||1)+')');
+  r.addColorStop(.3,'rgba(255,255,255,.45)');
+  r.addColorStop(.65,'rgba(255,255,255,.1)');
+  r.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=r;g.fillRect(0,0,128,128);return new THREE.CanvasTexture(c);
+}
+function plateTex(text){
+  var c=document.createElement('canvas');c.width=1024;c.height=220;var g=c.getContext('2d');
+  g.fillStyle='#F4F4F2';g.fillRect(0,0,1024,220);
+  g.fillStyle='#1B3A9B';g.fillRect(0,0,96,220);
+  g.fillStyle='#FFCC00';g.beginPath();
+  for(var i=0;i<12;i++){var a=i/12*Math.PI*2;g.moveTo(48+Math.cos(a)*26,64+Math.sin(a)*26);g.arc(48+Math.cos(a)*26,64+Math.sin(a)*26,4,0,7);}
+  g.fill();
+  g.fillStyle='#fff';g.font='bold 46px Arial';g.textAlign='center';g.fillText('F',48,168);
+  g.fillStyle='#111';g.font='bold 118px Arial';g.textAlign='center';
+  g.fillText(text,(1024+96)/2,152);
+  g.strokeStyle='#111';g.lineWidth=8;g.strokeRect(4,4,1016,212);
+  var t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.anisotropy=4; return t;
+}
+function studioEnv(){
+  // Cyclo blanc : grandes sources douces au-dessus, sol clair.
+  var c=document.createElement('canvas');c.width=1024;c.height=512;var g=c.getContext('2d');
+  var bg=g.createLinearGradient(0,0,0,512);
+  bg.addColorStop(0,'#FFFFFF');bg.addColorStop(.48,'#F2EFE8');bg.addColorStop(.52,'#DAD5C9');bg.addColorStop(1,'#B9B4A8');
+  g.fillStyle=bg;g.fillRect(0,0,1024,512);
+  function box(x,y,w,h,a,col){
+    var gr=g.createLinearGradient(x,y,x,y+h);
+    gr.addColorStop(0,'rgba(255,255,255,0)');
+    gr.addColorStop(.5,col||('rgba(255,255,255,'+a+')'));
+    gr.addColorStop(1,'rgba(255,255,255,0)');
+    g.fillStyle=gr;g.fillRect(x,y,w,h);
+  }
+  box(40,40,360,140,1);
+  box(560,30,340,150,1);
+  box(300,190,520,40,.5,'rgba(255,214,120,.55)');
+  box(120,196,220,34,.5,'rgba(255,120,90,.4)');
+  return c;
+}
+
+/* --- lofting : sections transversales interpolées --- */
+function sampleKeys(keys,x){
+  // keys triées de l'avant (x max) vers l'arrière (x min)
+  if(x>=keys[0][0]) return keys[0].slice(1);
+  var n=keys.length;
+  if(x<=keys[n-1][0]) return keys[n-1].slice(1);
+  for(var i=0;i<n-1;i++){
+    if(x<=keys[i][0]&&x>=keys[i+1][0]){
+      var t=smooth((keys[i][0]-x)/(keys[i][0]-keys[i+1][0])),out=[];
+      for(var k=1;k<keys[i].length;k++) out.push(lerp(keys[i][k],keys[i+1][k],t));
+      return out;
+    }
+  }
+  return keys[0].slice(1);
+}
+function sectionPoint(u,top,belt,bot,hw,eu,el){
+  // Normalise u dans [0,1). En JavaScript, le modulo d'un nombre négatif
+  // reste négatif (ex. -0.1 % 1 === -0.1), ce qui faisait passer une
+  // valeur négative dans Math.pow avec un exposant fractionnaire et
+  // produisait des NaN dans la géométrie Three.js.
+  var uu=((u%1)+1)%1,sign=1;
+  if(uu>.5){uu=1-uu;sign=-1;}
+  var y,z;
+  if(uu<=.25){var a=uu/.25*Math.PI/2;
+    z=hw*Math.pow(Math.sin(a),2/eu); y=belt+(top-belt)*Math.pow(Math.cos(a),2/eu);}
+  else{var b=(uu-.25)/.25*Math.PI/2;
+    z=hw*Math.pow(Math.cos(b),2/el); y=belt-(belt-bot)*Math.pow(Math.sin(b),2/el);}
+  return [sign*z,y];
+}
+function buildLoft(opt){
+  var keys=opt.keys,NX=opt.nx||110,NS=opt.ns||52,eu=opt.eu||2.6,el=opt.el||3.4;
+  var x0=opt.x0!==undefined?opt.x0:keys[0][0], x1=opt.x1!==undefined?opt.x1:keys[keys.length-1][0];
+  var u0=opt.u0!==undefined?opt.u0:0, u1=opt.u1!==undefined?opt.u1:1;
+  var closed=(u1-u0)>=1, inflate=opt.inflate||0, beltMix=opt.beltMix||.34;
+  var cols=closed?NS:NS+1, pos=[], idx=[];
+  for(var i=0;i<NX;i++){
+    var x=lerp(x0,x1,i/(NX-1)),k=sampleKeys(keys,x);
+    var top=k[0]+inflate,bot=k[2]-0,hw=k[3]+inflate;
+    var belt=(k[1]!==undefined&&opt.useBelt!==false)?k[1]:(bot+(top-bot)*beltMix);
+    for(var j=0;j<cols;j++){
+      var u=u0+(u1-u0)*(j/NS);
+      var p=sectionPoint(u,top,belt,bot,hw,eu,el);
+      pos.push(x,p[1],p[0]);
+    }
+  }
+  for(var a=0;a<NX-1;a++){
+    for(var b=0;b<(closed?NS:NS);b++){
+      var i0=a*cols+b,i1=a*cols+((b+1)%cols),i2=(a+1)*cols+((b+1)%cols),i3=(a+1)*cols+b;
+      if(!closed&&b===NS) continue;
+      idx.push(i0,i1,i2, i0,i2,i3);
+    }
+  }
+  if(closed&&opt.caps!==false){
+    // bouchons avant/arrière
+    [0,NX-1].forEach(function(row,ri){
+      var kk=sampleKeys(keys,lerp(x0,x1,row/(NX-1)));
+      var cx=lerp(x0,x1,row/(NX-1)),cy=(kk[0]+kk[2])/2;
+      pos.push(cx,cy,0); var ci=pos.length/3-1;
+      for(var b2=0;b2<NS;b2++){
+        var p0=row*cols+b2,p1=row*cols+((b2+1)%NS);
+        if(ri===0) idx.push(ci,p1,p0); else idx.push(ci,p0,p1);
+      }
+    });
+  }
+  var g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+
+/* Cotes M3 Compétition G80 : L 4,79 m — l 1,90 m — h 1,43 m */
+var BODY_KEYS=[
+  // x,     top,  belt, bot,  demi-largeur
+  [ 2.44, 0.66, 0.56, 0.36, 0.52],
+  [ 2.38, 0.86, 0.62, 0.28, 0.76],
+  [ 2.24, 0.96, 0.66, 0.24, 0.875],
+  [ 2.06, 1.01, 0.70, 0.24, 0.925],
+  [ 1.90, 1.04, 0.74, 0.34, 0.945],
+  [ 1.72, 1.05, 0.77, 0.62, 0.965],
+  [ 1.46, 1.06, 0.79, 0.93, 0.985],
+  [ 1.20, 1.06, 0.79, 0.62, 0.965],
+  [ 1.02, 1.07, 0.79, 0.28, 0.945],
+  [ 0.55, 1.055,0.78, 0.26, 0.945],
+  [ 0.00, 1.04, 0.77, 0.26, 0.95 ],
+  [-0.60, 1.035,0.77, 0.26, 0.95 ],
+  [-1.02, 1.05, 0.78, 0.28, 0.955],
+  [-1.20, 1.07, 0.79, 0.62, 0.975],
+  [-1.46, 1.09, 0.80, 0.93, 0.995],
+  [-1.72, 1.10, 0.81, 0.62, 0.985],
+  [-1.96, 1.12, 0.82, 0.30, 0.955],
+  [-2.20, 1.135,0.84, 0.30, 0.90 ],
+  [-2.38, 1.10, 0.84, 0.34, 0.78 ],
+  [-2.46, 0.98, 0.80, 0.42, 0.52 ]
+];
+var CABIN_KEYS=[
+  [ 1.12, 1.10, 1.02, 0.92, 0.86],
+  [ 0.86, 1.30, 1.06, 0.92, 0.845],
+  [ 0.56, 1.40, 1.08, 0.92, 0.83],
+  [ 0.18, 1.445,1.09, 0.93, 0.815],
+  [-0.22, 1.445,1.09, 0.93, 0.805],
+  [-0.62, 1.425,1.09, 0.94, 0.785],
+  [-1.02, 1.365,1.08, 0.95, 0.755],
+  [-1.42, 1.27, 1.07, 0.97, 0.715],
+  [-1.76, 1.17, 1.06, 1.00, 0.645],
+  [-1.99, 1.09, 1.04, 1.02, 0.52 ]
+];
+
+function buildWheel(x,z){
+  var g=new THREE.Group(),side=z>0?1:-1;
+  // pneu : profil de révolution, épaules arrondies
+  var pts=[];
+  pts.push(new THREE.Vector2(0.34,-0.155));
+  pts.push(new THREE.Vector2(0.42,-0.155));
+  pts.push(new THREE.Vector2(0.462,-0.125));
+  pts.push(new THREE.Vector2(0.468,-0.06));
+  pts.push(new THREE.Vector2(0.468, 0.06));
+  pts.push(new THREE.Vector2(0.462, 0.125));
+  pts.push(new THREE.Vector2(0.42, 0.155));
+  pts.push(new THREE.Vector2(0.34, 0.155));
+  var tyre=new THREE.Mesh(new THREE.LatheGeometry(pts,36),mats.rubber);
+  tyre.rotation.x=Math.PI/2; g.add(tyre);
+  // jante creuse
+  var rp=[];
+  rp.push(new THREE.Vector2(0.345,-0.15));
+  rp.push(new THREE.Vector2(0.345, 0.15));
+  rp.push(new THREE.Vector2(0.30, 0.15));
+  rp.push(new THREE.Vector2(0.20, 0.09));
+  rp.push(new THREE.Vector2(0.09, 0.075));
+  rp.push(new THREE.Vector2(0.00, 0.07));
+  var rim=new THREE.Mesh(new THREE.LatheGeometry(rp,32),mats.rim);
+  rim.rotation.x=Math.PI/2; rim.scale.z=side; g.add(rim);
+  // dix rayons (cinq doubles branches)
+  for(var i=0;i<10;i++){
+    var sp=new THREE.Mesh(new THREE.BoxGeometry(0.052,0.60,0.05),mats.rim);
+    sp.rotation.z=(i*Math.PI/5)+(i%2?0.11:-0.11);
+    sp.position.z=side*0.085; g.add(sp);
+  }
+  var hub=new THREE.Mesh(new THREE.CylinderGeometry(0.075,0.075,0.34,18),mats.rim);
+  hub.rotation.x=Math.PI/2; g.add(hub);
+  // disque + étrier rouge
+  var disc=new THREE.Mesh(new THREE.CylinderGeometry(0.30,0.30,0.05,26),mats.disc);
+  disc.rotation.x=Math.PI/2; disc.position.z=side*0.02; g.add(disc);
+  var cal=new THREE.Mesh(new THREE.BoxGeometry(0.13,0.30,0.07),mats.caliper);
+  cal.position.set(-0.16,0.14,side*0.05); cal.rotation.z=-0.5; g.add(cal);
+  g.position.set(x,0.468,z);
+  return g;
+}
+
+function buildCar(){
+  var g=new THREE.Group();
+
+  var body=new THREE.Mesh(buildLoft({keys:BODY_KEYS,nx:150,ns:56,eu:2.55,el:3.6}),mats.paint);
+  g.add(body);
+  var cabin=new THREE.Mesh(buildLoft({keys:CABIN_KEYS,nx:90,ns:48,eu:3.3,el:5.0}),mats.glass);
+  g.add(cabin);
+  // toit carbone : bandeau supérieur de l'habitacle, légèrement gonflé
+  var roof=new THREE.Mesh(buildLoft({keys:CABIN_KEYS,nx:70,ns:48,eu:3.3,el:5.0,
+    x0:0.92,x1:-1.80,u0:-0.115,u1:0.115,inflate:0.008}),mats.carbon);
+  roof.material.side=THREE.DoubleSide; g.add(roof);
+
+  // bas de caisse, lame, diffuseur, becquet
+  var skirt=new THREE.Mesh(new THREE.BoxGeometry(2.20,0.10,2.00),mats.carbon);
+  skirt.position.set(0,0.26,0); g.add(skirt);
+  var splitter=new THREE.Mesh(new THREE.BoxGeometry(0.42,0.05,1.86),mats.carbon);
+  splitter.position.set(2.32,0.20,0); g.add(splitter);
+  var diffuser=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.26,1.74),mats.carbon);
+  diffuser.position.set(-2.34,0.33,0); g.add(diffuser);
+  var duck=new THREE.Mesh(new THREE.BoxGeometry(0.40,0.045,1.80),mats.paint);
+  duck.position.set(-2.10,1.175,0); duck.rotation.z=-0.05; g.add(duck);
+
+  // rétroviseurs M sur double pied
+  [1,-1].forEach(function(sd){
+    var cap=new THREE.Mesh(new THREE.BoxGeometry(0.24,0.10,0.14),mats.carbon);
+    cap.position.set(1.00,1.13,sd*1.16); cap.rotation.y=sd*0.14; cap.rotation.z=0.06; g.add(cap);
+    var a1=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.14,0.04),mats.carbon);
+    a1.position.set(1.02,1.05,sd*1.03); a1.rotation.z=0.3; g.add(a1);
+    var a2=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.13,0.04),mats.carbon);
+    a2.position.set(0.94,1.05,sd*1.02); a2.rotation.z=-0.3; g.add(a2);
+  });
+
+  // doubles naseaux verticaux + lamelles
+  [1,-1].forEach(function(sd){
+    var frame=new THREE.Mesh(new THREE.BoxGeometry(0.10,0.80,0.40),mats.grilleFrame);
+    frame.position.set(2.34,0.60,sd*0.22); g.add(frame);
+    var back=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.72,0.33),mats.grille);
+    back.position.set(2.37,0.60,sd*0.22); g.add(back);
+    for(var i=0;i<7;i++){
+      var sl=new THREE.Mesh(new THREE.BoxGeometry(0.035,0.70,0.018),mats.grilleFrame);
+      sl.position.set(2.40,0.60,sd*0.22+(i-3)*0.044); g.add(sl);
+    }
+  });
+  // entrées d'air du bouclier
+  [1,-1].forEach(function(sd){
+    var it=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.22,0.40),mats.grille);
+    it.position.set(2.30,0.34,sd*0.66); g.add(it);
+  });
+  // ouïes d'aile
+  [1,-1].forEach(function(sd){
+    var v=new THREE.Mesh(new THREE.BoxGeometry(0.20,0.16,0.03),mats.carbon);
+    v.position.set(1.02,0.86,sd*0.955); g.add(v);
+  });
+
+  // optiques : bloc sombre + éléments LED
+  fx.head=[];
+  [1,-1].forEach(function(sd){
+    var housing=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.16,0.34),mats.lampHousing);
+    housing.position.set(2.24,0.88,sd*0.66); housing.rotation.z=0.06; g.add(housing);
+    var led=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.055,0.30),mats.head);
+    led.position.set(2.38,0.905,sd*0.66); g.add(led); fx.head.push(led);
+    var hook=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.13,0.05),mats.head);
+    hook.position.set(2.38,0.835,sd*0.79); g.add(hook); fx.head.push(hook);
+  });
+  // feux arrière en L
+  [1,-1].forEach(function(sd){
+    var hs=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.16,0.52),mats.lampHousing);
+    hs.position.set(-2.32,0.92,sd*0.60); g.add(hs);
+    var bar=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,0.48),mats.tail);
+    bar.position.set(-2.42,0.955,sd*0.60); g.add(bar);
+    var wing=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.14,0.09),mats.tail);
+    wing.position.set(-2.42,0.885,sd*0.80); g.add(wing);
+  });
+
+  // quadruple sortie
+  [0.30,0.48,-0.30,-0.48].forEach(function(z){
+    var tip=new THREE.Mesh(new THREE.CylinderGeometry(0.072,0.072,0.18,18),mats.exhaust);
+    tip.rotation.z=Math.PI/2; tip.position.set(-2.42,0.40,z); g.add(tip);
+    var hole=new THREE.Mesh(new THREE.CylinderGeometry(0.052,0.052,0.19,14),mats.grille);
+    hole.rotation.z=Math.PI/2; hole.position.set(-2.45,0.40,z); g.add(hole);
+  });
+
+  // plaques d'immatriculation BABA AUTO
+  var pm=new THREE.MeshStandardMaterial({map:plateTex(CONFIG.plate),roughness:.65,metalness:0});
+  var pf=new THREE.Mesh(new THREE.PlaneGeometry(0.52,0.112),pm);
+  pf.position.set(2.415,0.415,0); pf.rotation.y=Math.PI/2; g.add(pf);
+  var pr=new THREE.Mesh(new THREE.PlaneGeometry(0.52,0.112),pm);
+  pr.position.set(-2.44,0.72,0); pr.rotation.y=-Math.PI/2; g.add(pr);
+
+  g.add(buildWheel(1.46,0.90),buildWheel(1.46,-0.90),buildWheel(-1.46,0.90),buildWheel(-1.46,-0.90));
+  return g;
+}
+
+function tryLoadGLB(group,done){
+  if(!CONFIG.modelUrl){done(false);return;}
+  if(!THREE || !THREE.GLTFLoader){
+    console.error('BABA AUTO: GLTFLoader indisponible.');
+    done(false);return;
+  }
+  try{
+    var loader=new THREE.GLTFLoader();
+    var modelUrl=new URL(CONFIG.modelUrl,window.location.href).href;
+    loader.load(modelUrl,function(gl){
+      try{
+        var m=gl.scene;
+        if(!m) throw new Error('scene GLTF absente');
+
+        // Le modèle fourni est orienté longueur sur Z. On le tourne pour
+        // conserver les animations existantes qui font rouler la voiture sur X.
+        var box=new THREE.Box3().setFromObject(m),sz=new THREE.Vector3();
+        box.getSize(sz);
+        var longest=Math.max(sz.x,sz.z,.001);
+        m.scale.setScalar(4.79/longest);
+        m.rotation.y=Math.PI/2;
+        m.updateMatrixWorld(true);
+
+        // Recentrage exact + roues posées au sol.
+        box.setFromObject(m);
+        var cx=(box.min.x+box.max.x)/2;
+        var cz=(box.min.z+box.max.z)/2;
+        m.position.x-=cx;
+        m.position.z-=cz;
+        m.position.y-=box.min.y;
+        m.updateMatrixWorld(true);
+
+        // Matériaux compatibles avec le rendu clair du site.
+        m.traverse(function(o){
+          if(o.isMesh){
+            o.frustumCulled=true;
+            if(o.material){
+              var matsArr=Array.isArray(o.material)?o.material:[o.material];
+              matsArr.forEach(function(mat){
+                if('envMapIntensity' in mat) mat.envMapIntensity=Math.max(mat.envMapIntensity||0,1.05);
+                mat.needsUpdate=true;
+              });
+            }
+          }
+        });
+
+        fx.modelWheels=[];
+        m.traverse(function(o){
+          var n=(o.name||'').toLowerCase();
+          if(n.indexOf('tyre_')===0) fx.modelWheels.push(o);
+        });
+
+        // Retire uniquement l'ancienne carrosserie procédurale, garde l'ombre/FX.
+        var procedural=group.getObjectByName('proceduralFallback');
+        if(procedural) group.remove(procedural);
+        group.add(m);
+        fx.realCar=m;
+        addBMWBadge(group);
+        console.info('BABA AUTO: BMW M3 G80 GLTF chargée.');
+        done(true);
+      }catch(err){
+        console.error('BABA AUTO: erreur préparation BMW M3 G80',err);
+        done(false);
+      }
+    },function(xhr){
+      if(xhr && xhr.total){
+        state.loadModelProgress=Math.min(1,xhr.loaded/xhr.total);
+      }
+    },function(err){
+      console.error('BABA AUTO: échec chargement',modelUrl,err);
+      done(false);
+    });
+  }catch(e){
+    console.error('BABA AUTO: GLTFLoader exception',e);
+    done(false);
+  }
+}
+
+
+function makeTextTexture(text,bg,fg,w,h,fontSize){
+  var c=document.createElement('canvas'); c.width=w; c.height=h;
+  var x=c.getContext('2d');
+  x.fillStyle=bg; x.fillRect(0,0,w,h);
+  x.fillStyle=fg; x.textAlign='center'; x.textBaseline='middle';
+  x.font='900 '+fontSize+'px Arial, Helvetica, sans-serif';
+  x.fillText(text,w/2,h/2);
+  var t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.needsUpdate=true;
+  return t;
+}
+function makeBMWRoundelTexture(){
+  var c=document.createElement('canvas'); c.width=512; c.height=512;
+  var x=c.getContext('2d'),cx=256,cy=256;
+  x.clearRect(0,0,512,512);
+
+  x.beginPath(); x.arc(cx,cy,242,0,Math.PI*2); x.fillStyle='#111'; x.fill();
+  x.beginPath(); x.arc(cx,cy,190,0,Math.PI*2); x.fillStyle='#F5F5F5'; x.fill();
+  x.beginPath(); x.arc(cx,cy,136,0,Math.PI*2); x.fillStyle='#FFFFFF'; x.fill();
+
+  x.save(); x.beginPath(); x.arc(cx,cy,136,0,Math.PI*2); x.clip();
+  x.fillStyle='#2B8CCB'; x.fillRect(cx-136,cy-136,136,136);
+  x.fillRect(cx,cy,136,136);
+  x.restore();
+
+  x.fillStyle='#FFF'; x.font='900 72px Arial'; x.textAlign='center'; x.textBaseline='middle';
+  x.fillText('B',168,96); x.fillText('M',256,74); x.fillText('W',344,96);
+
+  var t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.needsUpdate=true;
+  return t;
+}
+function addBMWBadge(group){
+  if(!group || group.getObjectByName('bmwRoundel')) return;
+  var tex=makeBMWRoundelTexture();
+  var mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4});
+  var badge=new THREE.Mesh(new THREE.CircleGeometry(.115,64),mat);
+  badge.name='bmwRoundel';
+  badge.rotation.x=-Math.PI/2;
+  badge.position.set(1.78,1.015,0);
+  badge.renderOrder=20;
+  group.add(badge);
+  fx.bmwBadge=badge;
+}
+function buildGarage(){
+  var g=new THREE.Group(); g.name='babaGarage';
+
+  var wallMat=new THREE.MeshStandardMaterial({color:0x242424,metalness:.05,roughness:.82});
+  var darkMat=new THREE.MeshStandardMaterial({color:0x101010,metalness:.35,roughness:.48});
+  var beamMat=new THREE.MeshStandardMaterial({color:0x171717,metalness:.55,roughness:.38});
+  var yellowMat=new THREE.MeshStandardMaterial({color:0xFFC400,emissive:0x4A3200,emissiveIntensity:.15,roughness:.5});
+  var redMat=new THREE.MeshStandardMaterial({color:0xE0231F,emissive:0x5A0604,emissiveIntensity:.12,roughness:.45});
+
+  // Garage dimensions: car length runs on X.
+  var back=new THREE.Mesh(new THREE.BoxGeometry(.18,5.8,10.8),wallMat);
+  back.position.set(-4.15,2.85,0); g.add(back);
+
+  var left=new THREE.Mesh(new THREE.BoxGeometry(8.3,5.8,.18),wallMat);
+  left.position.set(0,2.85,-5.25); g.add(left);
+  var right=new THREE.Mesh(new THREE.BoxGeometry(8.3,5.8,.18),wallMat);
+  right.position.set(0,2.85,5.25); g.add(right);
+
+  var ceiling=new THREE.Mesh(new THREE.BoxGeometry(8.3,.14,10.5),darkMat);
+  ceiling.position.set(0,5.72,0); g.add(ceiling);
+
+  // Open entrance frame.
+  [-5.0,5.0].forEach(function(z){
+    var post=new THREE.Mesh(new THREE.BoxGeometry(.34,5.6,.34),beamMat);
+    post.position.set(3.85,2.8,z); g.add(post);
+  });
+  var topBeam=new THREE.Mesh(new THREE.BoxGeometry(.34,.34,10.3),beamMat);
+  topBeam.position.set(3.85,5.45,0); g.add(topBeam);
+
+  // Decorative yellow/red bands.
+  var stripeY=new THREE.Mesh(new THREE.BoxGeometry(.035,.18,9.5),yellowMat);
+  stripeY.position.set(-4.03,1.35,0); g.add(stripeY);
+  var stripeR=new THREE.Mesh(new THREE.BoxGeometry(.035,.08,9.5),redMat);
+  stripeR.position.set(-4.01,1.08,0); g.add(stripeR);
+
+  // BABA AUTO illuminated sign on rear wall.
+  var signTex=makeTextTexture('BABA AUTO','#FFC400','#17130C',1024,260,150);
+  var signMat=new THREE.MeshBasicMaterial({map:signTex,transparent:false,toneMapped:false});
+  var sign=new THREE.Mesh(new THREE.PlaneGeometry(3.9,.99),signMat);
+  sign.name='garageSign'; sign.position.set(-4.035,3.85,0); sign.rotation.y=Math.PI/2; g.add(sign);
+
+  // Warm light panels.
+  fx.garageLights=[];
+  [-3.2,0,3.2].forEach(function(z){
+    var panel=new THREE.Mesh(new THREE.PlaneGeometry(2.15,.22),
+      new THREE.MeshBasicMaterial({color:0xFFE4A1,transparent:true,opacity:.72,toneMapped:false}));
+    panel.rotation.x=Math.PI/2; panel.position.set(.2,5.62,z); g.add(panel);
+    fx.garageLights.push(panel);
+  });
+
+  // Roller-door slats, initially lifted, slight animation during intro.
+  var door=new THREE.Group(); door.name='garageDoor';
+  for(var i=0;i<12;i++){
+    var slat=new THREE.Mesh(new THREE.BoxGeometry(.08,.24,9.55),darkMat);
+    slat.position.set(3.77,5.15-i*.25,0); door.add(slat);
+  }
+  door.position.y=2.8; g.add(door);
+  fx.garageDoor=door;
+  fx.garageSign=sign;
+
+  scene.add(g);
+  fx.garage=g;
+}
+
+function initScene(){
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
+  state.dpr=Math.min(window.devicePixelRatio||1,2);
+  if((navigator.hardwareConcurrency||4)<=4||Math.min(innerWidth,innerHeight)<500){state.dpr=Math.min(state.dpr,1.5);state.q=.6;}
+  renderer.setPixelRatio(state.dpr);
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.15;
+  renderer.setClearColor(0x000000,0);
+  $('#stage').appendChild(renderer.domElement);
+  bump(.15);
+
+  scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(0x151515,0.028);
+  camera=new THREE.PerspectiveCamera(rig.fov,innerWidth/innerHeight,0.1,220);
+
+  var pm=new THREE.PMREMGenerator(renderer); pm.compileEquirectangularShader();
+  var eq=new THREE.CanvasTexture(studioEnv());
+  eq.mapping=THREE.EquirectangularReflectionMapping; eq.encoding=THREE.sRGBEncoding;
+  scene.environment=pm.fromEquirectangular(eq).texture;
+  eq.dispose(); pm.dispose();
+  bump(.35);
+
+  mats.paint=new THREE.MeshPhysicalMaterial({color:0xF0B300,metalness:.28,roughness:.22,
+    clearcoat:1,clearcoatRoughness:.035,envMapIntensity:1.25});
+  mats.glass=new THREE.MeshPhysicalMaterial({color:0x14161A,metalness:.35,roughness:.08,
+    envMapIntensity:1.5,transparent:true,opacity:.94});
+  mats.carbon=new THREE.MeshStandardMaterial({color:0x14161B,metalness:.7,roughness:.34,envMapIntensity:1});
+  mats.grille=new THREE.MeshStandardMaterial({color:0x0B0C0F,metalness:.4,roughness:.62});
+  mats.grilleFrame=new THREE.MeshStandardMaterial({color:0x1A1D22,metalness:.85,roughness:.28,envMapIntensity:1.2});
+  mats.lampHousing=new THREE.MeshPhysicalMaterial({color:0x0C0E12,metalness:.35,roughness:.10,
+    clearcoat:1,clearcoatRoughness:.05,envMapIntensity:1.4});
+  mats.rubber=new THREE.MeshStandardMaterial({color:0x121316,metalness:0,roughness:.94});
+  mats.rim=new THREE.MeshStandardMaterial({color:0x232529,metalness:.95,roughness:.35,envMapIntensity:1.1});
+  mats.disc=new THREE.MeshStandardMaterial({color:0x6E6E72,metalness:.9,roughness:.45});
+  mats.caliper=new THREE.MeshStandardMaterial({color:0xE0231F,metalness:.2,roughness:.4});
+  mats.exhaust=new THREE.MeshStandardMaterial({color:0x9AA0A6,metalness:1,roughness:.24,envMapIntensity:1.4});
+  mats.head=new THREE.MeshBasicMaterial({color:0xFFFFFF,transparent:true,opacity:0,toneMapped:false});
+  mats.tail=new THREE.MeshBasicMaterial({color:0xFF2A20,transparent:true,opacity:.35,toneMapped:false});
+
+  var floor=new THREE.Mesh(new THREE.PlaneGeometry(260,260),
+    new THREE.MeshStandardMaterial({color:0x2B2B2B,metalness:.08,roughness:.68,envMapIntensity:.55}));
+  floor.rotation.x=-Math.PI/2; scene.add(floor);
+  buildGarage();
+
+  var shadowTex=radialTex(.9);
+  var blob=new THREE.Mesh(new THREE.PlaneGeometry(6.6,3.2),
+    new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,opacity:.5,color:0x2A2418,depthWrite:false}));
+  blob.rotation.x=-Math.PI/2; blob.position.y=.014;
+
+  carPivot=new THREE.Group(); car=new THREE.Group();
+  var proceduralFallback=buildCar(); proceduralFallback.name='proceduralFallback';
+  car.add(proceduralFallback); car.add(blob); carPivot.add(car); scene.add(carPivot);
+  bump(.75);
+
+  var glow=radialTex(1);
+  fx.headGlow=[];
+  [1,-1].forEach(function(sd){
+    var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0xFFFFFF,
+      blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0}));
+    sp.scale.set(1.5,1.5,1); sp.position.set(2.5,0.9,sd*0.66); car.add(sp); fx.headGlow.push(sp);
+  });
+  fx.tailGlow=[];
+  [1,-1].forEach(function(sd){
+    var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0xFF2A20,
+      blending:THREE.NormalBlending,depthWrite:false,transparent:true,opacity:0}));
+    sp.scale.set(1.2,0.8,1); sp.position.set(-2.52,0.94,sd*0.62); car.add(sp); fx.tailGlow.push(sp);
+  });
+  fx.farGlow=new THREE.Sprite(new THREE.SpriteMaterial({map:glow,color:0xFFF6D8,
+    blending:THREE.NormalBlending,depthWrite:false,transparent:true,opacity:0}));
+  fx.farGlow.scale.set(3,3,1); fx.farGlow.position.set(2.7,0.9,0); car.add(fx.farGlow);
+
+  lights.amb=new THREE.HemisphereLight(0xFFF2D5,0x111111,.42); scene.add(lights.amb);
+  lights.key=new THREE.DirectionalLight(0xFFF0CC,0); lights.key.position.set(5,8,6); scene.add(lights.key);
+  lights.fill=new THREE.DirectionalLight(0xFFE6C0,0); lights.fill.position.set(-7,4,-5); scene.add(lights.fill);
+  lights.kick=new THREE.SpotLight(0xFF6A3A,0,44,1.0,.7,1.3);
+  lights.kick.position.set(-6,2.4,7); lights.kick.target=carPivot; scene.add(lights.kick);
+  lights.headL=new THREE.SpotLight(0xF4F8FF,0,30,.36,.5,1.2);
+  lights.headL.position.set(2.4,.9,.66); car.add(lights.headL);
+  lights.headL.target.position.set(20,.1,1.8); car.add(lights.headL.target);
+  lights.headR=new THREE.SpotLight(0xF4F8FF,0,30,.36,.5,1.2);
+  lights.headR.position.set(2.4,.9,-.66); car.add(lights.headR);
+  lights.headR.target.position.set(20,.1,-1.8); car.add(lights.headR.target);
+
+  // poussière : rendu normal, sinon invisible sur fond clair
+  var n=Math.round(320*state.q+140),dg=new THREE.BufferGeometry(),dp=new Float32Array(n*3);
+  for(var i=0;i<n;i++){dp[i*3]=(Math.random()-.5)*44;dp[i*3+1]=Math.random()*7;dp[i*3+2]=(Math.random()-.5)*28;}
+  dg.setAttribute('position',new THREE.BufferAttribute(dp,3));
+  dust=new THREE.Points(dg,new THREE.PointsMaterial({size:.03,map:glow,color:0xC8A23A,
+    transparent:true,opacity:.3,depthWrite:false,sizeAttenuation:true}));
+  scene.add(dust);
+
+  // traînées jaune/rouge, opaques (le fond est clair)
+  var sc=280,sg=new THREE.BufferGeometry(),sp2=new Float32Array(sc*6),scol=new Float32Array(sc*6);
+  for(var k=0;k<sc;k++){
+    var ang=Math.random()*Math.PI*2,rad=1.5+Math.random()*4.4;
+    var y=.08+Math.abs(Math.sin(ang))*rad*.55,z=Math.cos(ang)*rad;
+    var x=-12+Math.random()*24,len=1+Math.random()*3.4;
+    sp2[k*6]=x;sp2[k*6+1]=y;sp2[k*6+2]=z;
+    sp2[k*6+3]=x-len;sp2[k*6+4]=y;sp2[k*6+5]=z;
+    var red=Math.random()<.35;
+    scol[k*6]=red?.88:1; scol[k*6+1]=red?.14:.77; scol[k*6+2]=red?.12:0;
+    scol[k*6+3]=1; scol[k*6+4]=1; scol[k*6+5]=1;
+  }
+  sg.setAttribute('position',new THREE.BufferAttribute(sp2,3));
+  sg.setAttribute('color',new THREE.BufferAttribute(scol,3));
+  streaks=new THREE.LineSegments(sg,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0,depthWrite:false}));
+  streaks.visible=false; scene.add(streaks);
+
+  bump(.92);
+  applyRig(true); renderer.render(scene,camera);
+  bump(1);
+  tryLoadGLB(car,function(ok){if(!ok) console.warn('BMW M3 G80 : chargement impossible.');});
+  window.addEventListener('resize',onResize);
+  requestAnimationFrame(loop);
+}
+function onResize(){
+  if(!renderer) return;
+  camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+}
+var lastFov=-1;
+function applyRig(force){
+  var th=rig.theta+pointer.lx*.05+gyro.x;
+  var ph=clamp(rig.phi-pointer.ly*.035+gyro.y,-.03,.8),cp=Math.cos(ph);
+  camera.position.set(rig.tx+rig.r*cp*Math.cos(th),rig.ly+rig.r*Math.sin(ph),rig.tz+rig.r*cp*Math.sin(th));
+  if(rig.shake>.001){
+    camera.position.x+=(Math.random()-.5)*rig.shake;
+    camera.position.y+=(Math.random()-.5)*rig.shake*.7;
+    camera.position.z+=(Math.random()-.5)*rig.shake;
+  }
+  camera.lookAt(rig.tx+pointer.lx*.16,rig.ly*.85,rig.tz);
+  if(force||Math.abs(rig.fov-lastFov)>.01){camera.fov=rig.fov;camera.updateProjectionMatrix();lastFov=rig.fov;}
+}
+var lastT=performance.now(),fAcc=0,fN=0,down=false;
+function loop(now){
+  requestAnimationFrame(loop);
+  var dt=Math.min(.05,(now-lastT)/1000); lastT=now;
+  if(state.hidden||state.paused) return;
+  pointer.lx=lerp(pointer.lx,pointer.x,.055); pointer.ly=lerp(pointer.ly,pointer.y,.055);
+
+  if(state.introDone&&!state.camLocked){
+    var p=state.scrollP;
+    rig.r=HERO.r-p*2.3; rig.phi=HERO.phi+p*.05; rig.fov=HERO.fov;
+    carPivot.position.z=-p*5.4; carPivot.position.y=-p*.2; carPivot.rotation.y=-p*.14;
+    rig.shake=0;
+  }
+  if(state.speed>.005){
+    /* Roues GLTF : on conserve leurs transforms d'origine.
+       L'ancienne rotation locale utilisait le mauvais axe/pivot sur ce modèle
+       et faisait 's'envoler' les pneus. */
+    streaks.visible=true; streaks.material.opacity=state.speed*.7;
+    streaks.position.x=car.position.x;
+    var arr=streaks.geometry.attributes.position.array,d=48*state.speed*dt;
+    for(var i=0;i<arr.length;i+=3){
+      arr[i]-=d;
+      if(arr[i]<-14&&i%6===0){arr[i]+=26;arr[i+3]+=26;}
+    }
+    streaks.geometry.attributes.position.needsUpdate=true;
+    rig.shake=state.speed*.07;
+  } else if(streaks.visible){streaks.material.opacity=0;streaks.visible=false;}
+
+  dust.rotation.y+=dt*.012;
+  applyRig(false);
+  renderer.render(scene,camera);
+
+  fAcc+=dt;fN++;
+  if(fAcc>2){var fps=fN/fAcc;fAcc=0;fN=0;
+    if(!down&&fps<42&&state.dpr>1){down=true;state.dpr=Math.max(1,state.dpr*.75);renderer.setPixelRatio(state.dpr);}}
+}
+
+/* =========================================================
+   INTRO
+   ========================================================= */
+var intro=null;
+function buildIntro(){
+  document.body.classList.remove('intro-complete');
+  var wipe=$('#waveWipe'); if(wipe){wipe.style.display='block';wipe.style.visibility='visible';}
+  var tl=gsap.timeline({paused:true,onComplete:function(){endIntro(false);}});
+  gsap.set('#sheetYellow',{display:'none'}); gsap.set('#sheetRed',{display:'none'});
+
+  // S1 — garage BABA AUTO, la BMW arrive depuis l'extérieur
+  car.position.x=8.4;
+  if(fx.garageDoor) fx.garageDoor.position.y=2.8;
+  if(fx.garageSign) fx.garageSign.material.opacity=0;
+  tl.to(lights.amb,{intensity:.72,duration:1.4},0);
+  if(fx.garageSign) tl.to(fx.garageSign.material,{opacity:1,duration:.7,ease:'power2.out'},.25);
+  if(fx.garageLights) fx.garageLights.forEach(function(p,i){
+    tl.fromTo(p.material,{opacity:.12},{opacity:.78,duration:.28,yoyo:true,repeat:1},.25+i*.09);
+  });
+  if(fx.garageDoor) tl.to(fx.garageDoor.position,{y:0,duration:1.05,ease:'power2.out'},.35);
+  tl.to(car.position,{x:0,duration:2.25,ease:'power2.out'},.75);
+  tl.to(lights.key,{intensity:1.5,duration:1.6,ease:'power2.out'},.3);
+  tl.to(lights.fill,{intensity:.55,duration:1.6,ease:'power2.out'},.5);
+  tl.to(fx.farGlow.material,{opacity:.5,duration:.8},.2);
+  tl.to(rig,{r:17,duration:1.5,ease:'power1.inOut'},0);
+
+  // allumage des optiques
+  tl.to(mats.head,{opacity:1,duration:.22},1.0);
+  tl.to([lights.headL,lights.headR],{intensity:2.4,duration:.45},1.0);
+  tl.to(fx.headGlow.map(function(s){return s.material;}),{opacity:.75,duration:.4},1.0);
+  tl.to(fx.farGlow.material,{opacity:0,duration:.4},1.05);
+
+  // S2 — travelling autour de la voiture
+  tl.to(lights.kick,{intensity:1.6,duration:1.4,ease:'power2.out'},1.2);
+  tl.to(rig,{r:5.9,theta:-1.3,phi:.17,fov:42,duration:2.0,ease:'power2.inOut'},1.1);
+
+  // S3 — passage arrière, accélération
+  tl.to(rig,{theta:-2.8,phi:.05,r:6.4,ly:.62,duration:.9,ease:'power2.inOut'},3.15);
+  tl.to(mats.tail,{opacity:1,duration:.25},3.4);
+  tl.to(fx.tailGlow.map(function(s){return s.material;}),{opacity:.6,duration:.35},3.4);
+  tl.to(state,{speed:.55,duration:.35,ease:'power2.in'},3.8);
+  tl.to(car.position,{x:-.55,duration:.55,ease:'power2.inOut'},3.95);
+  tl.to(state,{speed:0,duration:.3,ease:'power2.out'},4.45);
+  tl.to(rig,{tx:-.4,r:4.9,fov:46,duration:.65,ease:'power2.inOut'},4.05);
+
+  // S4 — vagues jaune puis rouge, révélation du logo
+  tl.call(resetToHero,null,4.95);
+  tl.to('#motionblur',{opacity:0,duration:.2},4.95);
+  tl.fromTo('#sweep',{xPercent:-130,opacity:1},{xPercent:130,duration:.95,ease:'power2.inOut'},5.2);
+  tl.to('.wm-l i',{yPercent:0,duration:.55,stagger:.045,ease:'power3.out'},5.25);
+  tl.to('#sweep',{opacity:0,duration:.25},6.0);
+  tl.to('.tagline',{opacity:1,y:0,duration:.8,ease:'power2.out'},5.9);
+
+  // S5 — recul, l'interface se met en place
+  tl.to(rig,{r:HERO.r,theta:HERO.theta,phi:HERO.phi,ly:HERO.ly,fov:HERO.fov,tx:0,
+    duration:1.5,ease:'power2.inOut'},5.95);
+  tl.to('#heroCopy',{scale:1,y:0,duration:1.4,ease:'power2.inOut'},5.95);
+  tl.to('.site-header',{opacity:1,y:0,duration:.8,ease:'power2.out'},6.2);
+  tl.to('.hero-sub',{opacity:1,y:0,duration:.7,ease:'power2.out'},6.35);
+  tl.to('.cta-row > *',{opacity:1,y:0,duration:.6,stagger:.09,ease:'power2.out'},6.5);
+  tl.to('.scroll-hint',{opacity:1,duration:.6},6.85);
+  return tl;
+}
+function resetToHero(){
+  state.speed=0; car.position.x=0;
+  if(fx.garageDoor) fx.garageDoor.position.y=0;
+  rig.tx=0; rig.r=5.2; rig.theta=-.78; rig.phi=.12; rig.ly=.74; rig.fov=46;
+  if(streaks){streaks.visible=false;streaks.material.opacity=0;}
+}
+function finalState(){
+  $$('.wm-l i').forEach(function(i){i.style.transform='none';});
+  ['.tagline','.hero-sub','.site-header','.scroll-hint'].forEach(function(s){
+    var e=$(s); if(e){e.style.opacity=1;e.style.transform='none';}});
+  $$('.cta-row > *').forEach(function(e){e.style.opacity=1;e.style.transform='none';});
+  var hc=$('#heroCopy'); if(hc) hc.style.transform='none';
+  if(hasGSAP){gsap.set('#sheetYellow',{yPercent:-108});gsap.set('#sheetRed',{yPercent:-108});}
+  else{$('#sheetYellow').style.transform='translateY(-108%)';$('#sheetRed').style.transform='translateY(-108%)';}
+  if(webgl&&renderer){
+    resetToHero(); rig.r=HERO.r;rig.theta=HERO.theta;rig.phi=HERO.phi;rig.fov=HERO.fov;rig.ly=HERO.ly;
+    mats.head.opacity=1; mats.tail.opacity=.8;
+    lights.amb.intensity=.85; lights.key.intensity=1.5; lights.fill.intensity=.55; lights.kick.intensity=1.6;
+    lights.headL.intensity=2.4; lights.headR.intensity=2.4;
+    fx.headGlow.forEach(function(s){s.material.opacity=.75;});
+    fx.tailGlow.forEach(function(s){s.material.opacity=.5;});
+    fx.farGlow.material.opacity=0;
+    applyRig(true);
+  }
+}
+function endIntro(instant){
+  // Safari/iOS peut conserver le calque transformé des vagues après la timeline.
+  // On le sort d'abord de l'écran puis on le retire complètement du rendu.
+  if(hasGSAP){
+    gsap.killTweensOf(['#sheetRed','#sheetYellow']);
+    gsap.set(['#sheetRed','#sheetYellow'],{yPercent:-120,clearProps:'willChange'});
+  } else {
+    $('#sheetRed').style.transform='translate3d(0,-120%,0)';
+    $('#sheetYellow').style.transform='translate3d(0,-120%,0)';
+  }
+  document.body.classList.add('intro-complete');
+  var wipe=$('#waveWipe');
+  if(wipe){ wipe.style.display='none'; wipe.style.visibility='hidden'; }
+
+  if(state.introDone) return;
+  if(instant) finalState();
+  state.introDone=true;
+  document.body.classList.remove('intro-lock');
+  $('#skip').style.display='none';
+  setupScroll();
+}
+$('#skip').addEventListener('click',function(){
+  if(intro) intro.progress(1); else endIntro(true);
+});
+
+/* =========================================================
+   INTERACTIONS
+   ========================================================= */
+function setupPointer(){
+  if(isTouch) return;
+  window.addEventListener('mousemove',function(e){
+    pointer.x=(e.clientX/innerWidth-.5)*2; pointer.y=(e.clientY/innerHeight-.5)*2;
+  },{passive:true});
+}
+function setupGyro(){
+  if(!isTouch||reduced) return;
+  var go=function(){window.addEventListener('deviceorientation',function(e){
+    if(e.gamma==null) return;
+    gyro.x=clamp(e.gamma/90,-1,1)*.06; gyro.y=clamp((e.beta-45)/90,-1,1)*.03;
+  },{passive:true});};
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+    $('#sound').addEventListener('click',function once(){
+      DeviceOrientationEvent.requestPermission().then(function(r){if(r==='granted')go();}).catch(function(){});
+      $('#sound').removeEventListener('click',once);
+    });
+  } else go();
+}
+function setupScroll(){
+  var onScroll=function(){
+    var y=window.scrollY||window.pageYOffset,vh=innerHeight,hero=$('#hero');
+    if(hero&&hero.style.display!=='none'){
+      var f=clamp(1-y/(vh*.62),0,1);
+      $('#heroCopy').style.opacity=String(f);
+      if(!state.camLocked) state.paused=y>vh*1.35;
+    }
+  };
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+  if(hasGSAP&&window.ScrollTrigger&&webgl){
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.create({trigger:'#hero',start:'top top',end:'bottom top',scrub:.6,
+      onUpdate:function(s){state.scrollP=s.progress;}});
+  }
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest&&e.target.closest('#discover'); if(!b) return;
+  var go=function(){
+    location.hash='#/stock';
+    setTimeout(function(){
+      var c=document.querySelector('.car-card');
+      if(c){c.classList.remove('emerge');void c.offsetWidth;c.classList.add('emerge');}
+    },30);
+  };
+  if(!hasGSAP||!webgl||reduced){go();return;}
+  state.camLocked=true; state.paused=false;
+  gsap.timeline({onComplete:function(){state.camLocked=false;}})
+    .to(rig,{r:1.1,theta:-.04,phi:.02,ly:.9,fov:24,duration:.8,ease:'power3.in'})
+    .to(fx.headGlow.map(function(s){return s.material;}),{opacity:1,duration:.5},0)
+    .to('#flash',{opacity:1,duration:.3,ease:'power2.in'},.55)
+    .call(function(){go();resetToHero();
+      rig.r=HERO.r;rig.theta=HERO.theta;rig.phi=HERO.phi;rig.ly=HERO.ly;rig.fov=HERO.fov;})
+    .to('#flash',{opacity:0,duration:.85,ease:'power2.out'});
+});
+document.addEventListener('visibilitychange',function(){
+  state.hidden=document.hidden;
+  if(!document.hidden) lastT=performance.now();
+  if(document.hidden&&intro&&intro.isActive()) intro.pause();
+  else if(!document.hidden&&intro&&intro.paused()&&!state.introDone) intro.resume();
+});
+
+/* =========================================================
+   DÉMARRAGE
+   ========================================================= */
+function splitLetters(){
+  $$('[data-split]').forEach(function(el){
+    var t=el.textContent.trim(),o='';
+    for(var i=0;i<t.length;i++) o+='<span class="wm-l"><i>'+t[i]+'</i></span>';
+    el.innerHTML=o;
+  });
+}
+function boot(){
+  splitLetters(); Tach.build(); setupPointer(); setupGyro(); refreshAdminVehicles().then(function(){render();});
+  if(hasGSAP) gsap.set('.wm-l i',{yPercent:115});
+  else $$('.wm-l i').forEach(function(i){i.style.transform='translateY(115%)';});
+  if(!webgl){ document.body.classList.add('no-webgl'); bump(1); requestAnimationFrame(loaderTick); return; }
+  try{ initScene(); if(hasGSAP) intro=buildIntro(); }
+  catch(err){ console.warn('WebGL indisponible :',err); document.body.classList.add('no-webgl'); webgl=false; bump(1); }
+  requestAnimationFrame(loaderTick);
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+})();
+</script>
+</body>
+</html>
